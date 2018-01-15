@@ -20,24 +20,61 @@ package com.example.franc.misteryapp;
  */
 
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+
+import java.net.FileNameMap;
+import java.util.ArrayList;
+import java.util.TimerTask;
+
 import io.realm.OrderedRealmCollection;
 
-class MyListAdapter extends RealmBaseAdapter<Item> implements ListAdapter {
+class MyListAdapter extends BaseAdapter{
+    private Context context; //context
 
-    MyListAdapter(OrderedRealmCollection<Item> realmResults) {
-        super(realmResults);
+    ArrayList<Enemy> enemies = null;
+
+    @Override
+    public int getCount() {
+        return 0;
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return 0;
+    }
+
+    MyListAdapter(Context context, ArrayList<Enemy> enemies) {
+
+        this.enemies = enemies;
+        this.context = context;
+
     }
 
     private static class ViewHolder {
-        TextView text = null;
-        TextView category = null;
-        TextView date = null;
+        TextView name = null;
+
+    }
+
+    public void updateData(ArrayList<Enemy> enemies){
+
+        this.enemies = enemies;
     }
 
     @Override
@@ -47,20 +84,19 @@ class MyListAdapter extends RealmBaseAdapter<Item> implements ListAdapter {
             convertView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.layout_listview_main_row, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.text = convertView.findViewById(R.id.view_item_text);
-            viewHolder.category = convertView.findViewById(R.id.view_item_category);
-            viewHolder.date = convertView.findViewById(R.id.view_date_creation);
+            viewHolder.name = convertView.findViewById(R.id.enemy_name);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (adapterData != null) {
-            final Item item = adapterData.get(position);
-            viewHolder.text.setText(item.getText());
-            viewHolder.date.setText(item.getDateCreated());
-            viewHolder.category.setText(item.getCategory());
+        if (enemies != null) {
+            final Enemy item = enemies.get(position);
+            viewHolder.name.setText(item.getName());
         }
+
+
+
         return convertView;
     }
 
@@ -69,6 +105,31 @@ class MyListAdapter extends RealmBaseAdapter<Item> implements ListAdapter {
 
         RealmHelper helper = new RealmHelper();
         helper.addItem(item);
+    }
+
+    class MyThread extends Thread {
+        private Handler handler;
+        private int i = 0;
+        public MyThread(Handler handler) {
+            this.handler = handler;
+        }
+        public void run() {
+            try {
+                while(true) {
+                    notifyMessage("Secondi "+i);
+                    Thread.sleep(1000);
+                    i++;
+                }
+            }catch(InterruptedException ex) {}
+        }
+
+        private void notifyMessage(String str) {
+            Message msg = handler.obtainMessage();
+            Bundle b = new Bundle();
+            b.putString("refresh", ""+str);
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
     }
 }
 

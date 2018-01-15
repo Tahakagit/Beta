@@ -13,7 +13,15 @@ public class RealmHelper {
     private Realm mRealm;
     public RealmHelper() {}
 
-    public void addItem(final Item item){
+    public Player getPlayer(){
+
+        mRealm = Realm.getDefaultInstance();
+        Player getPlayer = mRealm.where(Player.class).findAll().first();
+        return getPlayer;
+
+    }
+
+    public void addItem(final RealmObject item){
 
         try {
             mRealm = Realm.getDefaultInstance();
@@ -26,6 +34,45 @@ public class RealmHelper {
         } finally {
             if(mRealm != null) {
                 mRealm.close();
+            }
+        }
+    }
+
+    public void restoreHealth(final Player item){
+
+        try {
+            mRealm = Realm.getDefaultInstance();
+            mRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    item.setHealth(100);
+                    realm.insertOrUpdate(item);
+                }
+            });
+        } finally {
+            if(mRealm != null) {
+                mRealm.close();
+            }
+        }
+    }
+
+
+    public void dealDamage(Realm realm, final Player item, final int damage){
+
+        try {
+/*
+            realm = Realm.getDefaultInstance();
+*/
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    item.setHealth(item.getHealth() - damage);
+                    realm.insertOrUpdate(item);
+                }
+            });
+        } finally {
+            if(realm != null) {
+                realm.close();
             }
         }
     }

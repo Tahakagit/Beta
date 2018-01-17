@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -14,6 +15,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -97,9 +99,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public ArrayList<Enemy> startThreads(ArrayList<Enemy> enemies){
-
         for (Enemy res:enemies) {
-            new BackgroundTask().execute(res);
+            new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, res);
 
         }
         return enemies;
@@ -139,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //todo avviare più asynctask PROBLEMA 
+    //todo avviare più asynctask PROBLEMA
     private class BackgroundTask extends AsyncTask<Enemy, Integer, Void>{
         public class Wrapper{
 
@@ -160,12 +161,13 @@ public class MainActivity extends AppCompatActivity {
         Wrapper wrapper = new Wrapper();
 
 
-        if (arg0[0].getHealth() > 0) {
+        if (arg0[0].getHealth() >= 0) {
             Realm realm = Realm.getDefaultInstance();
 
             player = realm.where(Player.class).findFirst();
-
             while (player.getHealth() > 0) {
+                Log.i("MainACtivity", arg0[0].getName() + " attacca");
+
                 try {
     /*
                 realm = Realm.getDefaultInstance();
@@ -178,12 +180,13 @@ public class MainActivity extends AppCompatActivity {
                             int salute = player.getHealth();
 
                             publishProgress(salute);
-                            Sleep(2000);
 
                         }
                     });
                 } finally {
                 }
+                Sleep(2000);
+
             }
 
             if(realm != null) {

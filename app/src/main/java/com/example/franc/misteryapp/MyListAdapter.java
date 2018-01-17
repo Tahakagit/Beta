@@ -26,110 +26,76 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
 import java.net.FileNameMap;
 import java.util.ArrayList;
 import java.util.TimerTask;
 
 import io.realm.OrderedRealmCollection;
 
-class MyListAdapter extends BaseAdapter{
-    private Context context; //context
+public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder> {
+    private ArrayList<Enemy> mDataset;
 
-    ArrayList<Enemy> enemies = null;
+    // Provide a reference to the views for each data item
+    // Complex data items may need more than one view per item, and
+    // you provide access to all the views for a data item in a view holder
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        public View mTextView;
+        public TextView mCardView;
+        CardView cv;
 
+        public ViewHolder(View v) {
+            super(v);
+            cv = (CardView)itemView.findViewById(R.id.cv);
+            mCardView = (TextView)itemView.findViewById(R.id.enemy_name);
+
+            mTextView = v;
+        }
+    }
+
+    // Provide a suitable constructor (depends on the kind of dataset)
+    public MyListAdapter(ArrayList<Enemy> myDataset) {
+        mDataset = myDataset;
+    }
+
+    // Create new views (invoked by the layout manager)
     @Override
-    public int getCount() {
-        return 0;
+    public MyListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                   int viewType) {
+        // create a new view
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.layout_listview_main_row, parent, false);
+        // set the view's size, margins, paddings and layout parameters
+
+        ViewHolder vh = new ViewHolder(v);
+
+        return vh;
     }
 
+    // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public Object getItem(int i) {
-        return null;
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        // - get element from your dataset at this position
+        // - replace the contents of the view with that element
+        holder.mCardView.setText(mDataset.get(position).getName());
+
     }
 
+    // Return the size of your dataset (invoked by the layout manager)
     @Override
-    public long getItemId(int i) {
-        return 0;
-    }
-
-    MyListAdapter(Context context, ArrayList<Enemy> enemies) {
-
-        this.enemies = enemies;
-        this.context = context;
-
-    }
-
-    private static class ViewHolder {
-        TextView name = null;
-
-    }
-
-    public void updateData(ArrayList<Enemy> enemies){
-
-        this.enemies = enemies;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.layout_listview_main_row, parent, false);
-            viewHolder = new ViewHolder();
-            viewHolder.name = convertView.findViewById(R.id.enemy_name);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-
-        if (enemies != null) {
-            final Enemy item = enemies.get(position);
-            viewHolder.name.setText(item.getName());
-        }
-
-
-
-        return convertView;
-    }
-
-
-    public void addItem(Item item){
-
-        RealmHelper helper = new RealmHelper();
-        helper.addItem(item);
-    }
-
-    class MyThread extends Thread {
-        private Handler handler;
-        private int i = 0;
-        public MyThread(Handler handler) {
-            this.handler = handler;
-        }
-        public void run() {
-            try {
-                while(true) {
-                    notifyMessage("Secondi "+i);
-                    Thread.sleep(1000);
-                    i++;
-                }
-            }catch(InterruptedException ex) {}
-        }
-
-        private void notifyMessage(String str) {
-            Message msg = handler.obtainMessage();
-            Bundle b = new Bundle();
-            b.putString("refresh", ""+str);
-            msg.setData(b);
-            handler.sendMessage(msg);
-        }
+    public int getItemCount() {
+        return mDataset.size();
     }
 }
-

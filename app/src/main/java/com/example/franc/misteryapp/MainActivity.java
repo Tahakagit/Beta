@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -11,21 +13,26 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
-    TextView io;
+    static TextView io;
     Realm mRealm = null;
     static RealmHelper helper = new RealmHelper();
     static Player  getPlayer = null;
-    private final static int INTERVAL = 2000; //2 minutes
-    static Handler mHandler = new Handler();
+/*
     static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+*/
     static MyListAdapter adapter;
-    static ListView list;
+    static RecyclerView list;
+    private RecyclerView.LayoutManager mLayoutManager;
+    Handler mHandler = new Handler();
+    int mHealth;
 
 
     @Override
@@ -34,34 +41,33 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Realm.init(this);
 
+        mRealm = Realm.getDefaultInstance();
+/*
+        spawnEnemies(generateEnemies(3));
+*/
+
         io = (TextView)findViewById(R.id.health);
         isPlayer();
+        list = (RecyclerView)findViewById(R.id.rv);
+
+
+        Enemy2 runn = new Enemy2(mHandler);
+        runn.run();
+        mLayoutManager = new LinearLayoutManager(this);
+        list.setLayoutManager(mLayoutManager);
+
+
 /*
-        io = findViewById(R.id.my_health);
+        ArrayList<Enemy> enemies = spawnEnemies(generateEnemies(3));
 */
 
-
-
-
 /*
-        Enemy newEnemy = new Enemy();
-
-        mHandler.post(newEnemy);
-        mHandler.postDelayed(newEnemy, 2000);
+        adapter = new MyListAdapter(enemies);
 */
-/*
-        io.setText(String.valueOf(getPlayer.getHealth()));
-*/
-
-        list = (ListView)findViewById(R.id.view_listview_main);
-
-        adapter = new MyListAdapter(this, enemies);
         list.setAdapter(adapter);
-        BackgroundTask task = new BackgroundTask();
-        task.execute();
 
-  /*      setInputForm();
-*/
+        RealmResults res = mRealm.where(Player.)
+
     }
     public boolean isPlayer(){
 
@@ -83,11 +89,42 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    final Runnable updateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateUI();
+        }
+    };
+    private void updateUI(){
+        //update ui
+        io.setText(String.valueOf(mHealth));
+    }
+
+    private void doStuff(){
+        //do other stuff
+        enemyRoutine();
+        mHandler.post(updateRunnable);
+    }
+
+
+
+    //todo spawnEnemies()
+/*
+    public ArrayList<Enemy> spawnEnemies(ArrayList<Enemy> enemies){
+
+        BackgroundTask task = new BackgroundTask().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, enemies);
+
+        return enemies;
+    }
+*/
+
     public void setListView(){
-        list = (ListView)findViewById(R.id.view_listview_main);
-        adapter = new MyListAdapter(this, enemies);
+        list = (RecyclerView) findViewById(R.id.rv);
+/*
+        adapter = new MyListAdapter(enemies);
+*/
         list.setAdapter(adapter);
-/**
+        /**
         list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int pos, long l) {
@@ -111,7 +148,34 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+        */
+    }
+    public int enemyRoutine(){
+/*
+        helper.dealDamage(realm, getPlayer, 20);
 */
+        Realm realm = Realm.getDefaultInstance();
+
+        final Player player = realm.where(Player.class).findFirst();
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                player.setHealth(player.getHealth() - 20);
+                realm.insertOrUpdate(player);
+
+            }
+        });
+
+        int salute = player.getHealth();
+
+        if(realm != null) {
+            realm.close();
+        }
+        mHealth = salute;
+
+        return salute;
+
     }
 
 
@@ -168,13 +232,23 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 */
+    private ArrayList<Enemy> generateEnemies(int enemiesNumber){
+        ArrayList<Enemy> enemies = new ArrayList<>();
 
+        for (int i = 0; i < enemiesNumber; i++){
 
-private class BackgroundTask extends AsyncTask<Void, Integer, BackgroundTask.Wrapper>{
+            Enemy enemy = new Enemy();
+            enemies.add(enemy);
+        }
+        return enemies;
+    }
 
+    private class BackgroundTask extends AsyncTask<Enemy, Integer, Void>{
+
+    //todo externalise class
     public class Wrapper{
 
-        ArrayList<Enemy> enemi;
+        Enemy enemi;
         int salute;
     }
 
@@ -188,22 +262,22 @@ private class BackgroundTask extends AsyncTask<Void, Integer, BackgroundTask.Wra
         {
         }
     }
-
     @Override
-    protected Wrapper doInBackground(Void... arg0) {
-        Enemy enemy = new Enemy();
+    protected Void doInBackground(Enemy... arg0) {
+
         Wrapper wrapper = new Wrapper();
 
 
+/*
         if (enemy.isAdded() == false){
-            enemy.setName("Pino");
+            enemy.setName(givenUsingPlainJava_whenGeneratingRandomStringUnbounded_thenCorrect());
             enemy.setAdded(true);
-            enemies.add(enemy);
-            adapter = new MyListAdapter(MainActivity.this, wrapper.enemi);
+            arg0[0].add(enemy);
 
 
         }
-        if (enemy.getHealth() > 0) {
+*/
+        if (arg0[0].getHealth() > 0) {
             Realm realm = Realm.getDefaultInstance();
 
             player = realm.where(Player.class).findFirst();
@@ -238,19 +312,25 @@ private class BackgroundTask extends AsyncTask<Void, Integer, BackgroundTask.Wra
         Sleep(2000);
 */
 
-        wrapper.enemi = enemies;
+        wrapper.enemi = arg0[0];
+/*
         wrapper.salute = enemy.getHealth();
-        return wrapper;
+*/
+        return null;
     }
 
     @Override
     protected void onProgressUpdate(Integer... values)
     {
         io.setText(String.valueOf(values[0]));
+/*
+        adapter.updateData(enemies);
+*/
     }
 
     @Override
-    protected void onPostExecute(Wrapper wrapper){
+    protected void onPostExecute(Void wrapper){
+
     }
     Player player;
     public int enemyRoutine(){
@@ -287,22 +367,5 @@ private class BackgroundTask extends AsyncTask<Void, Integer, BackgroundTask.Wra
     }
 
 
-}
-/*
-    void spawnEnemy()
-    {
-        mHandlerTask.run();
-
-
     }
-*/
-
-/*
-    void stopRepeatingTask()
-    {
-        mHandler.removeCallbacks(mHandlerTask);
-    }
-*/
-
-
 }

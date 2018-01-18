@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     public RealmResults<WeaponSet> generateWeapons(int weaponsNumber){
 //todo genera troppe armi
         RealmHelper helper = new RealmHelper();
-
+        helper.resetWeapons();
         for (int i = 0 ; i < weaponsNumber ; i++){
             WeaponSet weapons = new WeaponSet();
             weapons.setWeaponName("Missile");
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
             if (arg0[0].getHealth() >= 0) {
 
                 player = helper.getPlayer();
-                while (player.getHealth() > 0) {
+                while (helper.getPlayerHealth() > 0) {
                     Log.i("MainACtivity", arg0[0].getName() + " attacca");
 
                     try {

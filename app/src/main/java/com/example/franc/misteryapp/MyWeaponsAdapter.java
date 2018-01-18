@@ -20,30 +20,13 @@ package com.example.franc.misteryapp;
  */
 
 
-import android.app.ActivityManager;
-import android.content.Context;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.CompoundButton;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
-import java.net.FileNameMap;
-import java.util.ArrayList;
-import java.util.TimerTask;
-
-import io.realm.OrderedRealmCollection;
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.ViewHolder> {
@@ -61,7 +44,7 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
         public ViewHolder(View v) {
             super(v);
             cv = (CardView)itemView.findViewById(R.id.cv);
-            mCardView = (TextView)itemView.findViewById(R.id.enemy_name);
+            mCardView = (TextView)itemView.findViewById(R.id.weapon_name);
 
             mTextView = v;
         }
@@ -78,7 +61,7 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
                                                        int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.layout_listview_main_row, parent, false);
+                .inflate(R.layout.weapon_row, parent, false);
         // set the view's size, margins, paddings and layout parameters
 
         ViewHolder vh = new ViewHolder(v);

@@ -21,10 +21,14 @@ public class MainActivity extends AppCompatActivity {
     Realm mRealm = null;
     static RealmHelper helper = new RealmHelper();
     static Player  getPlayer = null;
-    private final static int INTERVAL = 2000; //2 minutes
-    static Handler mHandler = new Handler();
     static MyListAdapter enemyAdapter;
     static MyWeaponsAdapter weaponsAdapter;
+
+    //variabili per la generazione delle stringhe casuali
+    final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
+    final java.util.Random rand = new java.util.Random();
+    final Set<String> identifiers = new HashSet<String>();
+
 
     static RecyclerView list;
     static RecyclerView listWeapons;
@@ -63,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
         list.setAdapter(enemyAdapter);
 
     }
+
+    // inizializza il Player
     public boolean isPlayer(){
 
         mRealm = Realm.getDefaultInstance();
@@ -83,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
+    // riceve arraylist di Enemy e per ognuno avvia un thread
     public ArrayList<Enemy> startThreads(ArrayList<Enemy> enemies){
         for (Enemy res:enemies) {
             new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, res);
@@ -92,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
         return enemies;
     }
 
+    // genera N nemici
     public ArrayList<Enemy> generateEnemies(int enemiesNumber){
         ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 
@@ -103,9 +110,9 @@ public class MainActivity extends AppCompatActivity {
         return enemies;
     }
 
-
+    // inserisce N armi e ne restituisce il RealmResult
     public RealmResults<WeaponSet> generateWeapons(int weaponsNumber){
-
+//todo genera troppe armi
         RealmHelper helper = new RealmHelper();
 
         for (int i = 0 ; i < weaponsNumber ; i++){
@@ -117,14 +124,8 @@ public class MainActivity extends AppCompatActivity {
         return helper.getWeapons();
     }
 
-    // class variable
-    final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
 
-    final java.util.Random rand = new java.util.Random();
-
-    // consider using a Map<String,Boolean> to say whether the identifier is being used or not
-    final Set<String> identifiers = new HashSet<String>();
-
+    // genera stringhe casuali
     public String randomIdentifier() {
         StringBuilder builder = new StringBuilder();
         while(builder.toString().length() == 0) {
@@ -140,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //todo avviare più asynctask PROBLEMA
     private class BackgroundTask extends AsyncTask<Enemy, Integer, Void>{
         public class Wrapper{
 
@@ -158,10 +158,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Enemy... arg0) {
-        Wrapper wrapper = new Wrapper();
+            Wrapper wrapper = new Wrapper();
+            final Player player;
 
 
-        if (arg0[0].getHealth() >= 0) {
+
+            if (arg0[0].getHealth() >= 0) {
             Realm realm = Realm.getDefaultInstance();
 
             player = realm.where(Player.class).findFirst();
@@ -169,9 +171,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("MainACtivity", arg0[0].getName() + " attacca");
 
                 try {
-    /*
-                realm = Realm.getDefaultInstance();
-    */
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
@@ -211,39 +210,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        Player player;
-        public int enemyRoutine(){
-/*
-        helper.dealDamage(realm, getPlayer, 20);
-*/
-        Realm realm = Realm.getDefaultInstance();
-
-        player = realm.where(Player.class).findFirst();
-
-        while (player.getHealth() > 0) {
-            try {
-    /*
-                realm = Realm.getDefaultInstance();
-    */
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        player.setHealth(player.getHealth() - 20);
-                        realm.insertOrUpdate(player);
-
-                    }
-                });
-            } finally {
-            }
-        }
-        int salute = player.getHealth();
-
-        if(realm != null) {
-            realm.close();
-        }
-        return salute;
-
-    }
 
 
     }

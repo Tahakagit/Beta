@@ -4,18 +4,14 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Executor;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -27,8 +23,16 @@ public class MainActivity extends AppCompatActivity {
     static Player  getPlayer = null;
     private final static int INTERVAL = 2000; //2 minutes
     static Handler mHandler = new Handler();
-    static MyListAdapter adapter;
-    static ListView list;
+    static MyListAdapter enemyAdapter;
+    static MyWeaponsAdapter weaponsAdapter;
+
+    static RecyclerView list;
+    static RecyclerView listWeapons;
+
+    static ArrayList<Enemy> mEnemies = new ArrayList<>();
+    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView.LayoutManager mLayoutManagerWeapons;
+
 
 
     @Override
@@ -36,13 +40,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Realm.init(this);
-
         io = (TextView)findViewById(R.id.health);
-        isPlayer();
-        list = (ListView)findViewById(R.id.view_listview_main);
 
-        adapter = new MyListAdapter(this, startThreads(generateEnemies(2)));
-        list.setAdapter(adapter);
+        mEnemies = generateEnemies(2);
+        enemyAdapter = new MyListAdapter(mEnemies);
+
+        weaponsAdapter = new MyWeaponsAdapter(generateWeapons(4));
+
+        //crea Realmobject Player se non esiste e ricarica energia
+        isPlayer();
+
+        startThreads(mEnemies);
+        listWeapons = findViewById(R.id.rv_weapons);
+
+        list = (RecyclerView)findViewById(R.id.rv);
+        mLayoutManagerWeapons = new LinearLayoutManager(this);
+        mLayoutManager = new LinearLayoutManager(this);
+        list.setLayoutManager(mLayoutManager);
+        listWeapons.setLayoutManager(mLayoutManagerWeapons);
+        listWeapons.setAdapter(weaponsAdapter);
+
+        list.setAdapter(enemyAdapter);
 
     }
     public boolean isPlayer(){
@@ -65,38 +83,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void setListView(){
-        list = (ListView)findViewById(R.id.view_listview_main);
-/*
-        adapter = new MyListAdapter(this, enemies);
-*/
-        list.setAdapter(adapter);
-/**
-        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int pos, long l) {
-
-                final AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-                dialog.setTitle("Vuoi davvero cancellare?");
-                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        RealmHelper helper = new RealmHelper();
-                        helper.delItem(adapter.getItem(pos));
-                    }
-                });
-                dialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                });
-                dialog.show();
-                return false;
-            }
-        });
-*/
-    }
 
     public ArrayList<Enemy> startThreads(ArrayList<Enemy> enemies){
         for (Enemy res:enemies) {
@@ -115,6 +101,20 @@ public class MainActivity extends AppCompatActivity {
             enemies.add(enemy);
         }
         return enemies;
+    }
+
+
+    public RealmResults<WeaponSet> generateWeapons(int weaponsNumber){
+
+        RealmHelper helper = new RealmHelper();
+
+        for (int i = 0 ; i < weaponsNumber ; i++){
+            WeaponSet weapons = new WeaponSet();
+            weapons.setWeaponName("Missile");
+            helper.addWeapon(weapons);
+        }
+
+        return helper.getWeapons();
     }
 
     // class variable
@@ -208,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(Integer... values){
             io.setText(String.valueOf(values[0]));
+
         }
 
         Player player;

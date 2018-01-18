@@ -34,7 +34,7 @@ import io.realm.RealmResults;
  * The RealmBaseAdapter class is an abstract utility class for binding UI elements to Realm data, much like an
  * {@link android.widget.CursorAdapter}.
  * <p>
- * This adapter will automatically handle any updates to its data and call {@link #notifyDataSetChanged()} as
+ * This enemyAdapter will automatically handle any updates to its data and call {@link #notifyDataSetChanged()} as
  * appropriate.
  * <p>
  * The RealmAdapter will stop receiving updates if the Realm instance providing the {@link io.realm.RealmResults} is
@@ -47,7 +47,7 @@ public abstract class RealmBaseAdapter<T extends RealmModel> extends BaseAdapter
 
     public RealmBaseAdapter(@Nullable OrderedRealmCollection<T> data) {
         if (data != null && !data.isManaged())
-            throw new IllegalStateException("Only use this adapter with managed list, " +
+            throw new IllegalStateException("Only use this enemyAdapter with managed list, " +
                     "for un-managed lists you can just use the BaseAdapter");
         this.adapterData = data;
         this.listener = new RealmChangeListener<OrderedRealmCollection<T>>() {
@@ -105,7 +105,7 @@ public abstract class RealmBaseAdapter<T extends RealmModel> extends BaseAdapter
     /**
      * Get the data item associated with the specified position in the data set.
      *
-     * @param position Position of the item whose data we want within the adapter's
+     * @param position Position of the item whose data we want within the enemyAdapter's
      * data set.
      * @return The data at the specified position.
      */
@@ -121,7 +121,7 @@ public abstract class RealmBaseAdapter<T extends RealmModel> extends BaseAdapter
      * cannot rely on the item ID being the same after {@link #notifyDataSetChanged()} or
      * {@link #updateData(OrderedRealmCollection)} has been called.
      *
-     * @param position The position of the item within the adapter's data set whose row id we want.
+     * @param position The position of the item within the enemyAdapter's data set whose row id we want.
      * @return The id of the item at the specified position.
      */
     @Override
@@ -134,10 +134,10 @@ public abstract class RealmBaseAdapter<T extends RealmModel> extends BaseAdapter
      * Updates the data associated with the Adapter.
      *
      * Note that RealmResults and RealmLists are "live" views, so they will automatically be updated to reflect the
-     * latest changes. This will also trigger {@code notifyDataSetChanged()} to be called on the adapter.
+     * latest changes. This will also trigger {@code notifyDataSetChanged()} to be called on the enemyAdapter.
      *
      * This method is therefore only useful if you want to display data based on a new query without replacing the
-     * adapter.
+     * enemyAdapter.
      *
      * @param data the new {@link OrderedRealmCollection} to display.
      */

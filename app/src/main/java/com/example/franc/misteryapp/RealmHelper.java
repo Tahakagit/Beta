@@ -21,6 +21,14 @@ public class RealmHelper {
 
     }
 
+    public RealmResults<WeaponSet> getWeapons(){
+
+        mRealm = Realm.getDefaultInstance();
+        RealmResults<WeaponSet> getWeapons = mRealm.where(WeaponSet.class).findAll();
+        return getWeapons;
+
+    }
+
     public void addItem(final RealmObject item){
 
         try {
@@ -37,6 +45,24 @@ public class RealmHelper {
             }
         }
     }
+
+    public void addWeapon(final RealmObject item){
+
+        try {
+            mRealm = Realm.getDefaultInstance();
+            mRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.insertOrUpdate(item);
+                }
+            });
+        } finally {
+            if(mRealm != null) {
+                mRealm.close();
+            }
+        }
+    }
+
 
     public void restoreHealth(final Player item){
 

@@ -43,9 +43,11 @@ import java.util.ArrayList;
 import java.util.TimerTask;
 
 import io.realm.OrderedRealmCollection;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
-public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder> {
-    private ArrayList<Enemy> mDataset;
+public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.ViewHolder> {
+    private RealmResults<WeaponSet> mDataset;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -66,13 +68,13 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyListAdapter(ArrayList<Enemy> myDataset) {
+    public MyWeaponsAdapter(RealmResults<WeaponSet> myDataset) {
         mDataset = myDataset;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public MyListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+    public MyWeaponsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                        int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
@@ -89,7 +91,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.mCardView.setText(mDataset.get(position).getName());
+        holder.mCardView.setText(mDataset.get(position).getWeaponName());
 
     }
 

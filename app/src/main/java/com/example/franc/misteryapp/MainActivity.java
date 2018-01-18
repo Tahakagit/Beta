@@ -160,39 +160,26 @@ public class MainActivity extends AppCompatActivity {
         protected Void doInBackground(Enemy... arg0) {
             Wrapper wrapper = new Wrapper();
             final Player player;
+            final RealmHelper helper = new RealmHelper();
 
 
 
             if (arg0[0].getHealth() >= 0) {
-            Realm realm = Realm.getDefaultInstance();
 
-            player = realm.where(Player.class).findFirst();
-            while (player.getHealth() > 0) {
-                Log.i("MainACtivity", arg0[0].getName() + " attacca");
+                player = helper.getPlayer();
+                while (player.getHealth() > 0) {
+                    Log.i("MainACtivity", arg0[0].getName() + " attacca");
 
-                try {
-                    realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            player.setHealth(player.getHealth() - 20);
-                            realm.insertOrUpdate(player);
-                            int salute = player.getHealth();
+                    try {
+                        helper.dealDamage(player, 2);
+                        int salute = player.getHealth();
+                        publishProgress(salute);
 
-                            publishProgress(salute);
-
-                        }
-                    });
-                } finally {
+                    } finally {
+                    }
+                    Sleep(2000);
                 }
-                Sleep(2000);
-
             }
-
-            if(realm != null) {
-                realm.close();
-            }
-
-        }
 /*
         Sleep(2000);
 */
@@ -202,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         wrapper.salute = enemy.getHealth();
 */
         return null;
-    }
+        }
 
         @Override
         protected void onProgressUpdate(Integer... values){

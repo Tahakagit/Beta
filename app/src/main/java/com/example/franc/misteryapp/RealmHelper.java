@@ -83,13 +83,11 @@ public class RealmHelper {
     }
 
 
-    public void dealDamage(Realm realm, final Player item, final int damage){
+    public void dealDamage(final Player item, final int damage){
 
         try {
-/*
-            realm = Realm.getDefaultInstance();
-*/
-            realm.executeTransaction(new Realm.Transaction() {
+            mRealm = Realm.getDefaultInstance();
+            mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
                     item.setHealth(item.getHealth() - damage);
@@ -97,8 +95,8 @@ public class RealmHelper {
                 }
             });
         } finally {
-            if(realm != null) {
-                realm.close();
+            if(mRealm != null) {
+                mRealm.close();
             }
         }
     }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     static ArrayList<Enemy> mEnemies = new ArrayList<>();
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.LayoutManager mLayoutManagerWeapons;
+    private ArrayList<Enemy> selectedEnemies = new ArrayList<Enemy>();
 
 
 
@@ -65,6 +67,20 @@ public class MainActivity extends AppCompatActivity {
         listWeapons.setAdapter(weaponsAdapter);
 
         list.setAdapter(enemyAdapter);
+        list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for (Enemy model : mEnemies) {
+                    if (model.isSelected()) {
+                        selectedEnemies.add(model);
+                    }else {
+                        selectedEnemies.remove(model);
+                    }
+                }
+
+            }
+        });
+        String text = "";
 
     }
 
@@ -139,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return builder.toString();
     }
+
 
 
     private class BackgroundTask extends AsyncTask<Enemy, Integer, Void>{

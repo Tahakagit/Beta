@@ -11,6 +11,7 @@ public class Enemy{
     private String name = null;
     private int health = 20;
     private boolean isAdded = false;
+    private boolean isSelected = false;
 
     public int getHealth() {
         return health;
@@ -34,5 +35,13 @@ public class Enemy{
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
     }
 }

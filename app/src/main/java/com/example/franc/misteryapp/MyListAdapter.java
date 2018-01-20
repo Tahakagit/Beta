@@ -39,6 +39,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
         // each data item is just a string in this case
         public View mTextView;
         public TextView mCardView;
+        public boolean isSelected = false;
         CardView cv;
 
         public ViewHolder(View v) {
@@ -55,10 +56,10 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
         mDataset = myDataset;
     }
 
+
     // Create new views (invoked by the layout manager)
     @Override
-    public MyListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                       int viewType) {
+    public MyListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.enemy_row, parent, false);
@@ -71,12 +72,31 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.mCardView.setText(mDataset.get(position).getName());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                if (mDataset.get(position).isSelected()){
+                    holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.cardview_light_background));
+                    mDataset.get(position).setSelected(false);
+
+                }else {
+                    holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.colorAccent));
+                    mDataset.get(position).setSelected(true);
+/*
+                    holder.isSelected = false;
+*/
+                }
+            }
+
+        });
     }
+
+
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override

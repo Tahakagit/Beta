@@ -44,6 +44,8 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
         // each data item is just a string in this case
         public View mTextView;
         public TextView mCardView;
+        public TextView enemyHealth;
+
         public boolean isSelected = false;
         CardView cv;
 
@@ -51,6 +53,8 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
             super(v);
             cv = (CardView)itemView.findViewById(R.id.cv);
             mCardView = (TextView)itemView.findViewById(R.id.enemy_name);
+            enemyHealth = itemView.findViewById(R.id.enemy_health);
+
 
             mTextView = v;
         }
@@ -86,6 +90,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.mCardView.setText(mDataset.get(position).getName());
+        holder.enemyHealth.setText(String.valueOf(mDataset.get(position).getHealth()));
         //todo creare campo energia
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

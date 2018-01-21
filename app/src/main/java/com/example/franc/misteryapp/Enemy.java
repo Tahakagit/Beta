@@ -46,6 +46,6 @@ public class Enemy{
     }
 
     public void getDamage(int damage){
-        this.health =- damage;
+        this.health = this.health - damage;
     }
 }

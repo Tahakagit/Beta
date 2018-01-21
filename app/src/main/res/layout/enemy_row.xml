@@ -21,12 +21,27 @@
 
 
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/enemy_name"
-                android:textAlignment="center"
-                />
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/enemy_name"
+                    android:layout_weight=".5"
+                    android:textAlignment="center"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_weight=".5"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/enemy_health"
+                    android:textAlignment="center"
+                    />
+
+
+            </LinearLayout>
 
         </RelativeLayout>
 

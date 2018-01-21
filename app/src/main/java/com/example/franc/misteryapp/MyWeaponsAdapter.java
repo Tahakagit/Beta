@@ -39,12 +39,15 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
         // each data item is just a string in this case
         public View mTextView;
         public TextView mCardView;
+        public TextView weaponPower;
+
         CardView cv;
 
         public ViewHolder(View v) {
             super(v);
             cv = (CardView)itemView.findViewById(R.id.cv);
             mCardView = (TextView)itemView.findViewById(R.id.weapon_name);
+            weaponPower = (TextView)itemView.findViewById(R.id.weapon_power);
 
             mTextView = v;
         }
@@ -75,6 +78,7 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.mCardView.setText(mDataset.get(position).getWeaponName());
+        holder.weaponPower.setText(String.valueOf(mDataset.get(position).getWeaponDamage()));
 
     }
 

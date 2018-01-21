@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
         for (int i = 0 ; i < weaponsNumber ; i++){
             WeaponSet weapons = new WeaponSet();
             weapons.setWeaponName("Missile");
-            weapons.setWeaponDamage(40);
+            weapons.setWeaponDamage(3);
             weapons.setWeapondID(randomIdentifier());
             helper.addWeapon(weapons);
         }
@@ -230,9 +230,18 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
             int position = viewHolder.getAdapterPosition();
 
             int power = weaponsAdapter.deleteItemAt(position);
+
+            // danneggia il selezionato
             selectedEnemies.get(0).getDamage(power);
-            mEnemies.remove(selectedEnemies.get(0));
-            selectedEnemies.remove(selectedEnemies.get(0));
+
+            if (selectedEnemies.get(0).getHealth() <= 0){
+                mEnemies.remove(selectedEnemies.get(0));
+                selectedEnemies.remove(selectedEnemies.get(0));
+
+                enemyAdapter.notifyDataSetChanged();
+
+
+            }
             enemyAdapter.notifyDataSetChanged();
 
         }

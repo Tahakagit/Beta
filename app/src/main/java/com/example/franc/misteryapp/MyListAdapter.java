@@ -20,6 +20,7 @@ package com.example.franc.misteryapp;
  */
 
 
+import android.app.Activity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,6 +32,10 @@ import java.util.ArrayList;
 
 public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder> {
     private ArrayList<Enemy> mDataset;
+    private OnItemSelectedListener iface;
+    private OnItemDeselectedListener iface2;
+    Activity activity;
+
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -49,11 +54,16 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
             mTextView = v;
         }
+
+
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyListAdapter(ArrayList<Enemy> myDataset) {
+    public MyListAdapter(ArrayList<Enemy> myDataset, Activity activity) {
         mDataset = myDataset;
+        this.activity = activity;
+        this.iface = (OnItemSelectedListener) activity;
+        this.iface2 = (OnItemDeselectedListener) activity;
     }
 
 
@@ -83,10 +93,11 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
                 if (mDataset.get(position).isSelected()){
                     holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.cardview_light_background));
                     mDataset.get(position).setSelected(false);
-
+                    iface2.onItemDeselected(mDataset.get(position));
                 }else {
                     holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.colorAccent));
                     mDataset.get(position).setSelected(true);
+                    iface.onItemSelected(mDataset.get(position));
 /*
                     holder.isSelected = false;
 */
@@ -95,8 +106,16 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
         });
     }
+    public interface OnItemDeselectedListener {
+
+        void onItemDeselected(Enemy item);
+    }
 
 
+    public interface OnItemSelectedListener {
+
+        void onItemSelected(Enemy item);
+    }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override

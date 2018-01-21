@@ -17,7 +17,7 @@ import java.util.Set;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MyListAdapter.OnItemSelectedListener, MyListAdapter.OnItemDeselectedListener{
     TextView io;
     Realm mRealm = null;
     static RealmHelper helper = new RealmHelper();
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         io = (TextView)findViewById(R.id.health);
 
         mEnemies = generateEnemies(2);
-        enemyAdapter = new MyListAdapter(mEnemies);
+        enemyAdapter = new MyListAdapter(mEnemies, MainActivity.this);
 
         weaponsAdapter = new MyWeaponsAdapter(generateWeapons(4));
 
@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         listWeapons.setAdapter(weaponsAdapter);
 
         list.setAdapter(enemyAdapter);
+/*
         list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+*/
         String text = "";
 
     }
@@ -156,7 +158,15 @@ public class MainActivity extends AppCompatActivity {
         return builder.toString();
     }
 
+    //rimuove dai selezionati l'elemento deselezionato
+    public void onItemDeselected(Enemy item) {
+        selectedEnemies.remove(item);
+    }
 
+    @Override
+    public void onItemSelected(Enemy item) {
+        selectedEnemies.add(item);
+    }
 
     private class BackgroundTask extends AsyncTask<Enemy, Integer, Void>{
         public class Wrapper{

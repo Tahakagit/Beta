@@ -44,4 +44,8 @@ public class Enemy{
     public boolean isSelected() {
         return isSelected;
     }
+
+    public void getDamage(int damage){
+        this.health =- damage;
+    }
 }

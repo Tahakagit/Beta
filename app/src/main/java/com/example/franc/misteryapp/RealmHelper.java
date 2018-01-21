@@ -1,5 +1,7 @@
 package com.example.franc.misteryapp;
 
+import android.webkit.WebMessagePort;
+
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
@@ -60,6 +62,29 @@ public class RealmHelper {
 
     }
 
+
+    public int removeWeapondAt(int index){
+
+        int weaponPower;
+        try {
+            mRealm = Realm.getDefaultInstance();
+            RealmResults<WeaponSet> resultWeapon = mRealm.where(WeaponSet.class).findAll();
+            final WeaponSet weapon = resultWeapon.get(index);
+            weaponPower = weapon.getWeaponDamage();
+            mRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    weapon.deleteFromRealm();
+                }
+            });
+        } finally {
+            if(mRealm != null) {
+                mRealm.close();
+            }
+        }
+
+        return weaponPower;
+    }
 
     public void addItem(final RealmObject item){
 

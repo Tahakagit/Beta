@@ -6,10 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +40,9 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.LayoutManager mLayoutManagerWeapons;
     private ArrayList<Enemy> selectedEnemies = new ArrayList<Enemy>();
+    private ArrayList<WeaponSet> weaponSets = new ArrayList<WeaponSet>();
 
+    ArrayList<Enemy> existingEnemies = new ArrayList<Enemy>();
 
 
     @Override
@@ -51,7 +55,10 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
         mEnemies = generateEnemies(2);
         enemyAdapter = new MyListAdapter(mEnemies, MainActivity.this);
 
-        weaponsAdapter = new MyWeaponsAdapter(generateWeapons(4));
+/*
+        weaponSets = generateWeapons(4);
+*/
+        weaponsAdapter = new MyWeaponsAdapter(generateWeapons(25));
 
         //crea Realmobject Player se non esiste e ricarica energia
         isPlayer();
@@ -67,22 +74,10 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
         listWeapons.setAdapter(weaponsAdapter);
 
         list.setAdapter(enemyAdapter);
-/*
-        list.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                for (Enemy model : mEnemies) {
-                    if (model.isSelected()) {
-                        selectedEnemies.add(model);
-                    }else {
-                        selectedEnemies.remove(model);
-                    }
-                }
 
-            }
-        });
-*/
-        String text = "";
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(listWeapons);
+
 
     }
 
@@ -125,17 +120,20 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
             enemy.setName(randomIdentifier());
             enemies.add(enemy);
         }
-        return enemies;
+        existingEnemies = enemies;
+
+        return existingEnemies;
     }
 
     // inserisce N armi e ne restituisce il RealmResult
     public RealmResults<WeaponSet> generateWeapons(int weaponsNumber){
-//todo genera troppe armi
         RealmHelper helper = new RealmHelper();
         helper.resetWeapons();
         for (int i = 0 ; i < weaponsNumber ; i++){
             WeaponSet weapons = new WeaponSet();
             weapons.setWeaponName("Missile");
+            weapons.setWeaponDamage(40);
+            weapons.setWeapondID(randomIdentifier());
             helper.addWeapon(weapons);
         }
 
@@ -189,12 +187,10 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
             final Player player;
             final RealmHelper helper = new RealmHelper();
 
+            player = helper.getPlayer();
 
+            while (arg0[0].getHealth() > 0 && helper.getPlayerHealth() > 0) {
 
-            if (arg0[0].getHealth() >= 0) {
-
-                player = helper.getPlayer();
-                while (helper.getPlayerHealth() > 0) {
                     Log.i("MainACtivity", arg0[0].getName() + " attacca");
 
                     try {
@@ -205,17 +201,9 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
                     } finally {
                     }
                     Sleep(2000);
-                }
-            }
-/*
-        Sleep(2000);
-*/
 
-/*
-        wrapper.enemi = enemies;
-        wrapper.salute = enemy.getHealth();
-*/
-        return null;
+            }
+            return null;
         }
 
         @Override
@@ -228,5 +216,26 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
 
     }
 
+
+    ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+            //Remove swiped item from list and notify the RecyclerView
+            int position = viewHolder.getAdapterPosition();
+
+            int power = weaponsAdapter.deleteItemAt(position);
+            selectedEnemies.get(0).getDamage(power);
+            mEnemies.remove(selectedEnemies.get(0));
+            selectedEnemies.remove(selectedEnemies.get(0));
+            enemyAdapter.notifyDataSetChanged();
+
+        }
+    };
 
 }

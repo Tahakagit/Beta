@@ -78,6 +78,20 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
 
     }
 
+
+    public int deleteItemAt(int position){
+        RealmHelper helper = new RealmHelper();
+        int weaponPower;
+
+        //ho la posizione della lista
+        weaponPower = helper.removeWeapondAt(position);
+
+        notifyItemRangeRemoved(position, 1);
+        //query realm results alla posizione
+        //ritornare
+
+        return weaponPower;
+    }
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {

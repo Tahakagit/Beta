@@ -86,6 +86,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.mCardView.setText(mDataset.get(position).getName());
+        //todo creare campo energia
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

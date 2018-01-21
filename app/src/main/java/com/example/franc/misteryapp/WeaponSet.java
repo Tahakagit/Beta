@@ -1,6 +1,9 @@
 package com.example.franc.misteryapp;
 
+import java.security.Timestamp;
+
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by franc on 14/01/2018.
@@ -10,6 +13,8 @@ public class WeaponSet extends RealmObject {
 
     String weaponName;
     int weaponDamage;
+    @PrimaryKey
+    private String weaponID;
 
     public String getWeaponName() {
         return weaponName;
@@ -25,5 +30,13 @@ public class WeaponSet extends RealmObject {
 
     public void setWeaponDamage(int weaponDamage) {
         this.weaponDamage = weaponDamage;
+    }
+
+    public String getWeapondID() {
+        return weaponID;
+    }
+
+    public void setWeapondID(String timestamp) {
+        this.weaponID = timestamp;
     }
 }

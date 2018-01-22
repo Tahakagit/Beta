@@ -1,17 +1,14 @@
 package com.example.franc.misteryapp;
 
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
-import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,12 +16,12 @@ import java.util.Set;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class MainActivity extends AppCompatActivity implements MyListAdapter.OnItemSelectedListener, MyListAdapter.OnItemDeselectedListener{
+public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.OnItemSelectedListener, MyEnemyAdapter.OnItemDeselectedListener{
     TextView io;
     Realm mRealm = null;
     static RealmHelper helper = new RealmHelper();
     static Player  getPlayer = null;
-    static MyListAdapter enemyAdapter;
+    static MyEnemyAdapter enemyAdapter;
     static MyWeaponsAdapter weaponsAdapter;
 
     //variabili per la generazione delle stringhe casuali
@@ -37,12 +34,12 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
     static RecyclerView listWeapons;
 
     static ArrayList<Enemy> mEnemies = new ArrayList<>();
+    static ArrayList<Enemy> selectedEnemies = new ArrayList();
+
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.LayoutManager mLayoutManagerWeapons;
-    private ArrayList<Enemy> selectedEnemies = new ArrayList<Enemy>();
-    private ArrayList<WeaponSet> weaponSets = new ArrayList<WeaponSet>();
 
-    ArrayList<Enemy> existingEnemies = new ArrayList<Enemy>();
+    ArrayList<Enemy> existingEnemies = new ArrayList<>();
 
 
     @Override
@@ -53,11 +50,8 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
         io = (TextView)findViewById(R.id.health);
 
         mEnemies = generateEnemies(2);
-        enemyAdapter = new MyListAdapter(mEnemies, MainActivity.this);
+        enemyAdapter = new MyEnemyAdapter(mEnemies, MainActivity.this);
 
-/*
-        weaponSets = generateWeapons(4);
-*/
         weaponsAdapter = new MyWeaponsAdapter(generateWeapons(25));
 
         //crea Realmobject Player se non esiste e ricarica energia
@@ -103,17 +97,16 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
     }
 
     // riceve arraylist di Enemy e per ognuno avvia un thread
-    public ArrayList<Enemy> startThreads(ArrayList<Enemy> enemies){
+    public void startThreads(ArrayList<Enemy> enemies){
         for (Enemy res:enemies) {
             new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, res);
 
         }
-        return enemies;
     }
 
     // genera N nemici
     public ArrayList<Enemy> generateEnemies(int enemiesNumber){
-        ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+        ArrayList<Enemy> enemies = new ArrayList<>();
 
         for (int i = 0 ; i < enemiesNumber ; i++){
             Enemy enemy = new Enemy();
@@ -131,15 +124,19 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
         helper.resetWeapons();
         for (int i = 0 ; i < weaponsNumber ; i++){
             WeaponSet weapons = new WeaponSet();
+            if (i == 0)
+                weapons.setViewType(0);
+            else
+                weapons.setViewType(1);
             weapons.setWeaponName("Missile");
             weapons.setWeaponDamage(3);
             weapons.setWeapondID(randomIdentifier());
+
             helper.addWeapon(weapons);
         }
 
         return helper.getWeapons();
     }
-
 
     // genera stringhe casuali
     public String randomIdentifier() {
@@ -157,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
     }
 
     //rimuove dai selezionati l'elemento deselezionato
+    @Override
     public void onItemDeselected(Enemy item) {
         selectedEnemies.remove(item);
     }
@@ -166,12 +164,9 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
         selectedEnemies.add(item);
     }
 
-    private class BackgroundTask extends AsyncTask<Enemy, Integer, Void>{
-        public class Wrapper{
 
-        ArrayList<Enemy> enemi;
-        int salute;
-    }
+    // thread per il comportamento del nemico
+    private class BackgroundTask extends AsyncTask<Enemy, Integer, Void>{
 
         void Sleep(int ms){
             try{
@@ -183,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
 
         @Override
         protected Void doInBackground(Enemy... arg0) {
-            Wrapper wrapper = new Wrapper();
             final Player player;
             final RealmHelper helper = new RealmHelper();
 
@@ -192,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
             while (arg0[0].getHealth() > 0 && helper.getPlayerHealth() > 0) {
 
                     Log.i("MainACtivity", arg0[0].getName() + " attacca");
-
                     try {
                         helper.dealDamage(player, 2);
                         int salute = player.getHealth();
@@ -217,11 +210,25 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
     }
 
 
+    // interfaccia per il controllo dello swipe delle armi
     ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+
             return false;
+        }
+
+        @Override
+        public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            if (viewHolder.getAdapterPosition() > 0) return 0;
+            return super.getSwipeDirs(recyclerView, viewHolder);
+        }
+
+        @Override
+        public boolean isItemViewSwipeEnabled() {
+            return super.isItemViewSwipeEnabled();
         }
 
         @Override
@@ -229,21 +236,24 @@ public class MainActivity extends AppCompatActivity implements MyListAdapter.OnI
             //Remove swiped item from list and notify the RecyclerView
             int position = viewHolder.getAdapterPosition();
 
+
+
+            // rimuove on swipe il proiettile e ne ritorna in danno
             int power = weaponsAdapter.deleteItemAt(position);
 
             // danneggia il selezionato
             selectedEnemies.get(0).getDamage(power);
 
+            // se il nemico è morto
             if (selectedEnemies.get(0).getHealth() <= 0){
+
+                // lo rimuovo dalle liste recyclerview e selected
                 mEnemies.remove(selectedEnemies.get(0));
                 selectedEnemies.remove(selectedEnemies.get(0));
 
                 enemyAdapter.notifyDataSetChanged();
-
-
             }
             enemyAdapter.notifyDataSetChanged();
-
         }
     };
 

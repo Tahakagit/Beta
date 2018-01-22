@@ -30,7 +30,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder> {
+public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHolder> {
     private ArrayList<Enemy> mDataset;
     private OnItemSelectedListener iface;
     private OnItemDeselectedListener iface2;
@@ -63,7 +63,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyListAdapter(ArrayList<Enemy> myDataset, Activity activity) {
+    public MyEnemyAdapter(ArrayList<Enemy> myDataset, Activity activity) {
         mDataset = myDataset;
         this.activity = activity;
         this.iface = (OnItemSelectedListener) activity;
@@ -73,7 +73,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
     // Create new views (invoked by the layout manager)
     @Override
-    public MyListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyEnemyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.enemy_row, parent, false);

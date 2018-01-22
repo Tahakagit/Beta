@@ -53,23 +53,30 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
         }
     }
 
+
     // Provide a suitable constructor (depends on the kind of dataset)
     public MyWeaponsAdapter(RealmResults<WeaponSet> myDataset) {
+
         mDataset = myDataset;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public MyWeaponsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                       int viewType) {
+    public MyWeaponsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.weapon_row, parent, false);
         // set the view's size, margins, paddings and layout parameters
 
+
         ViewHolder vh = new ViewHolder(v);
 
         return vh;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return this.mDataset.get(position).getViewType();
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -79,6 +86,7 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
         // - replace the contents of the view with that element
         holder.mCardView.setText(mDataset.get(position).getWeaponName());
         holder.weaponPower.setText(String.valueOf(mDataset.get(position).getWeaponDamage()));
+
 
     }
 

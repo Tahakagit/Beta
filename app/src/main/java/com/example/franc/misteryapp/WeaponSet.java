@@ -15,6 +15,7 @@ public class WeaponSet extends RealmObject {
     int weaponDamage;
     @PrimaryKey
     private String weaponID;
+    private int viewType;
 
     public String getWeaponName() {
         return weaponName;
@@ -38,5 +39,13 @@ public class WeaponSet extends RealmObject {
 
     public void setWeapondID(String timestamp) {
         this.weaponID = timestamp;
+    }
+
+    public int getViewType() {
+        return viewType;
+    }
+
+    public void setViewType(int viewType) {
+        this.viewType = viewType;
     }
 }

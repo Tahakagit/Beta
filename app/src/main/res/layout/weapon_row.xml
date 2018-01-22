@@ -25,6 +25,16 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/weapon_reload"
+                    android:textAlignment="center"
+                    android:layout_weight=".1"
+
+                    />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -37,7 +47,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight=".5"
+                    android:layout_weight=".4"
                     android:id="@+id/weapon_power"
                     android:textAlignment="center"
                     />

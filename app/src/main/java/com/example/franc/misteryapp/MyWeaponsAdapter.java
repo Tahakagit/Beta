@@ -20,6 +20,7 @@ package com.example.franc.misteryapp;
  */
 
 
+import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -40,6 +41,7 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
         public View mTextView;
         public TextView mCardView;
         public TextView weaponPower;
+        public TextView reloadTime;
 
         CardView cv;
 
@@ -48,6 +50,7 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
             cv = (CardView)itemView.findViewById(R.id.cv);
             mCardView = (TextView)itemView.findViewById(R.id.weapon_name);
             weaponPower = (TextView)itemView.findViewById(R.id.weapon_power);
+            reloadTime = itemView.findViewById(R.id.weapon_reload);
 
             mTextView = v;
         }
@@ -71,9 +74,13 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
 
         ViewHolder vh = new ViewHolder(v);
 
+
         return vh;
     }
 
+
+
+    // prendo il valore viewtype dell'oggetto e lo assegno al viewholder
     @Override
     public int getItemViewType(int position) {
         return this.mDataset.get(position).getViewType();
@@ -89,6 +96,7 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
 
 
     }
+
 
 
     public int deleteItemAt(int position){
@@ -109,4 +117,8 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
     public int getItemCount() {
         return mDataset.size();
     }
+
+
+
+
 }

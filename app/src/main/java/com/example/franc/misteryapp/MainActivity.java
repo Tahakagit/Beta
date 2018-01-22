@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -14,10 +15,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.OnItemSelectedListener, MyEnemyAdapter.OnItemDeselectedListener{
     TextView io;
+    TextView weaponReload;
     Realm mRealm = null;
     static RealmHelper helper = new RealmHelper();
     static Player  getPlayer = null;
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
     final Set<String> identifiers = new HashSet<String>();
 
 
+    static RealmResults<WeaponSet> weapons;
     static RecyclerView list;
     static RecyclerView listWeapons;
 
@@ -52,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
         mEnemies = generateEnemies(2);
         enemyAdapter = new MyEnemyAdapter(mEnemies, MainActivity.this);
 
-        weaponsAdapter = new MyWeaponsAdapter(generateWeapons(25));
+        weapons = generateWeapons(25);
+        weaponsAdapter = new MyWeaponsAdapter(weapons);
 
         //crea Realmobject Player se non esiste e ricarica energia
         isPlayer();
@@ -71,6 +76,17 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(listWeapons);
+
+/*
+        RealmResults<WeaponSet> weapons = helper.getWeapons();
+        weapons.addChangeListener(new RealmChangeListener<RealmResults<WeaponSet>>() {
+            @Override
+            public void onChange(RealmResults<WeaponSet> weaponSets) {
+                helper.setFirst();
+                weaponsAdapter.notifyDataSetChanged();
+            }
+        });
+*/
 
 
     }
@@ -120,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
 
     // inserisce N armi e ne restituisce il RealmResult
     public RealmResults<WeaponSet> generateWeapons(int weaponsNumber){
-        RealmHelper helper = new RealmHelper();
+        final RealmHelper helper = new RealmHelper();
         helper.resetWeapons();
         for (int i = 0 ; i < weaponsNumber ; i++){
             WeaponSet weapons = new WeaponSet();
@@ -210,6 +226,8 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
     }
 
 
+
+
     // interfaccia per il controllo dello swipe delle armi
     ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
 
@@ -220,9 +238,10 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
             return false;
         }
 
+        // inizializza le direzioni di swipe, null se non è swipabile
         @Override
         public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            if (viewHolder.getAdapterPosition() > 0) return 0;
+            if (viewHolder.getItemViewType() > 0) return 0;
             return super.getSwipeDirs(recyclerView, viewHolder);
         }
 
@@ -236,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
             //Remove swiped item from list and notify the RecyclerView
             int position = viewHolder.getAdapterPosition();
 
+            new reloadTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (MyWeaponsAdapter.ViewHolder)listWeapons.findViewHolderForAdapterPosition(0));
 
 
             // rimuove on swipe il proiettile e ne ritorna in danno
@@ -251,10 +271,53 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
                 mEnemies.remove(selectedEnemies.get(0));
                 selectedEnemies.remove(selectedEnemies.get(0));
 
+/*
                 enemyAdapter.notifyDataSetChanged();
+*/
             }
             enemyAdapter.notifyDataSetChanged();
+            // controllare
+
+
+
+
         }
+
+
     };
+
+    // thread per il tempo di caricamento delle arrmi
+    private class reloadTask extends AsyncTask<MyWeaponsAdapter.ViewHolder, Void, Void> {
+
+        RealmHelper helper = new RealmHelper();
+        MyWeaponsAdapter.ViewHolder currentHolder;
+
+        void Sleep(int ms){
+            try{
+                Thread.sleep(ms);
+            }
+            catch (Exception e){
+            }
+        }
+
+        @Override
+        protected Void doInBackground(MyWeaponsAdapter.ViewHolder... arg0) {
+            currentHolder = arg0[0];
+            Sleep(1000);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+
+            currentHolder.reloadTime.setText(R.string.generic_ok);
+            // primo nel db diventa primo nella lista e swipable
+            weaponsAdapter.notifyDataSetChanged();
+            helper.setFirst();
+
+        }
+    }
 
 }

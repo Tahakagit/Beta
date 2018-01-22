@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MisteryApp</string>
+    <string name="generic_ok">OK</string>
 </resources>

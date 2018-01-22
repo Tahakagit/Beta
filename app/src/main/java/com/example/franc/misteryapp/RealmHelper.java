@@ -139,6 +139,26 @@ public class RealmHelper {
         }
     }
 
+    public void setFirst(){
+
+        try {
+            mRealm = Realm.getDefaultInstance();
+            mRealm.executeTransaction(new Realm.Transaction() {
+                WeaponSet realFirst = mRealm.where(WeaponSet.class).findFirst();
+
+                @Override
+                public void execute(Realm realm) {
+                    realFirst.setViewType(0);
+                    realm.insertOrUpdate(realFirst);
+                }
+            });
+        } finally {
+            if(mRealm != null) {
+                mRealm.close();
+            }
+        }
+    }
+
 
     public void dealDamage(final Player item, final int damage){
 

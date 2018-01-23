@@ -1,12 +1,16 @@
 package com.example.franc.misteryapp;
 
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
         weapons = generateWeapons(25);
         weaponsAdapter = new MyWeaponsAdapter(weapons);
 
+        startNavDrawer();
         //crea Realmobject Player se non esiste e ricarica energia
         isPlayer();
 
@@ -91,8 +96,44 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
 
     }
 
+
+    //NAVIGATION DRAWER
+    public void startNavDrawer(){
+        final DrawerLayout mDrawerLayout;
+        final Intent creaConto = new Intent(this, NavigationActivity.class);
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
+        if (navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(
+                    new NavigationView.OnNavigationItemSelectedListener() {
+                        @Override
+                        public boolean onNavigationItemSelected(MenuItem menuItem) {
+                            switch (menuItem.getItemId())
+                            {
+                                case R.id.action_category_1:
+                                    startActivity(creaConto);
+                                    break;
+                                case R.id.action_category_2:
+                                    //tabLayout.getTabAt(1).select();
+                                    break;
+                                case R.id.action_category_3:
+                                    //tabLayout.getTabAt(2).select();
+                            }
+
+                            mDrawerLayout.closeDrawers();
+                            return true;
+                        }
+                    });
+        }
+
+
+    }
+
     // inizializza il Player
     public boolean isPlayer(){
+        //todo ritorna il player
 
         mRealm = Realm.getDefaultInstance();
 
@@ -104,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
 
         if (getPlayer == null){
             Player player = new Player();
+            player.setLocation("XDE-23");
             helper.addItem(player);
         }else {
             helper.restoreHealth(getPlayer);

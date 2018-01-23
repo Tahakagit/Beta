@@ -11,7 +11,8 @@ import io.realm.RealmObject;
 public class Player extends RealmObject {
 
     private int health = 100;
-    private String name;
+    private String name = null;
+    private String location = null;
 
     public Player() {
     }
@@ -22,5 +23,13 @@ public class Player extends RealmObject {
 
     public void setHealth(int health) {
         this.health = health;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

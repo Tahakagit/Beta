@@ -22,6 +22,23 @@ public class RealmHelper {
         return getPlayer;
 
     }
+    public String getPlayerLocation(){
+
+        mRealm = Realm.getDefaultInstance();
+        String getPlayerLocation = mRealm.where(Player.class).findAll().first().getLocation();
+        mRealm.close();
+        return getPlayerLocation;
+
+    }
+
+    public RealmResults<LocationRealmObject> getLocationsAtStar(String star){
+
+        mRealm = Realm.getDefaultInstance();
+
+        RealmResults<LocationRealmObject> listOfLocations= mRealm.where(LocationRealmObject.class).equalTo("locationStar", star).findAll();
+
+        return listOfLocations;
+    }
 
     public int getPlayerHealth(){
 

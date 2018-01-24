@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.navigation_drawer);
         Realm.init(this);
         io = (TextView)findViewById(R.id.health);
 
@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
     }
 
     // riceve arraylist di Enemy e per ognuno avvia un thread
+    // todo deve cessare al termine dell'activity
     public void startThreads(ArrayList<Enemy> enemies){
         for (Enemy res:enemies) {
             new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, res);

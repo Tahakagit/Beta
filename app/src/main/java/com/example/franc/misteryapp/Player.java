@@ -26,7 +26,7 @@ public class Player extends RealmObject {
     }
 
     public String getLocation() {
-        return location;
+        return this.location;
     }
 
     public void setLocation(String location) {

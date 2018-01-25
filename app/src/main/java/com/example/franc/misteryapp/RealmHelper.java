@@ -22,22 +22,56 @@ public class RealmHelper {
         return getPlayer;
 
     }
+    public void resetLocation(){
+        String position;
+        mRealm = Realm.getDefaultInstance();
+        final Player getPlayer = mRealm.where(Player.class).findAll().first();
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                getPlayer.setLocation(null);
+
+            }
+        });
+
+        mRealm.close();
+
+    }
     public String getPlayerLocation(){
 
+        String position;
         mRealm = Realm.getDefaultInstance();
-        String getPlayerLocation = mRealm.where(Player.class).findAll().first().getLocation();
+        Player getPlayer = mRealm.where(Player.class).findAll().first();
+        position = getPlayer.getLocation();
         mRealm.close();
-        return getPlayerLocation;
+        return position;
 
     }
 
-    public RealmResults<LocationRealmObject> getLocationsAtStar(String star){
+    public void setPlayerLocation(final String firstStar){
+
+        mRealm = Realm.getDefaultInstance();
+        final Player player = mRealm.where(Player.class).findAll().first();
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                player.setLocation(firstStar);
+
+            }
+        });
+        mRealm.close();
+
+    }
+
+
+    public RealmResults<LocationRealmObject> getPlacesAtPLayerPosition(){
 
         mRealm = Realm.getDefaultInstance();
 
-        RealmResults<LocationRealmObject> listOfLocations= mRealm.where(LocationRealmObject.class).equalTo("locationStar", star).findAll();
+        RealmResults<LocationRealmObject> listOfPlaces= mRealm.where(LocationRealmObject.class).equalTo("locationStar", getPlayerLocation()).findAll();
 
-        return listOfLocations;
+        mRealm.close();
+        return listOfPlaces;
     }
 
     public int getPlayerHealth(){
@@ -71,6 +105,28 @@ public class RealmHelper {
         }
 
     }
+
+    public void resetUniverse(){
+
+        try {
+            mRealm = Realm.getDefaultInstance();
+
+            mRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    RealmResults<LocationRealmObject> getWeapons = mRealm.where(LocationRealmObject.class).findAll();
+                    getWeapons.deleteAllFromRealm();
+
+                }
+            });
+
+        } finally {
+            mRealm.close();
+
+        }
+
+    }
+
     public RealmResults<WeaponSet> getWeapons(){
 
         mRealm = Realm.getDefaultInstance();
@@ -225,6 +281,17 @@ public class RealmHelper {
             }
         }
         return result;
+    }
+
+    public String getFirstStar(){
+
+        mRealm = Realm.getDefaultInstance();
+
+        String firstStar= mRealm.where(LocationRealmObject.class).findFirst().getLocationStar();
+
+        return firstStar;
+
+
     }
 
 }

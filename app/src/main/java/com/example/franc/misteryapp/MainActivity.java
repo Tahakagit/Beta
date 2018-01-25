@@ -32,9 +32,6 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
     static MyWeaponsAdapter weaponsAdapter;
 
     //variabili per la generazione delle stringhe casuali
-    final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
-    final java.util.Random rand = new java.util.Random();
-    final Set<String> identifiers = new HashSet<String>();
 
 
     static RealmResults<WeaponSet> weapons;
@@ -145,9 +142,9 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
 
         if (getPlayer == null){
             Player player = new Player();
-            player.setLocation("XDE-23");
             helper.addItem(player);
         }else {
+            helper.resetLocation();
             helper.restoreHealth(getPlayer);
         }
         mRealm.close();
@@ -199,6 +196,10 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
 
     // genera stringhe casuali
     public String randomIdentifier() {
+        final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
+        final java.util.Random rand = new java.util.Random();
+        final Set<String> identifiers = new HashSet<String>();
+
         StringBuilder builder = new StringBuilder();
         while(builder.toString().length() == 0) {
             int length = rand.nextInt(5)+5;

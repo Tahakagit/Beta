@@ -52,6 +52,11 @@ public class MyNavigationAdapter extends RecyclerView.Adapter<MyNavigationAdapte
     }
 
 
+    public  void UpdateAdapter(RealmResults<LocationRealmObject> newDataset){
+
+        mDataset = newDataset;
+        notifyDataSetChanged();
+    }
     // Create new views (invoked by the layout manager)
     @Override
     public MyNavigationAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

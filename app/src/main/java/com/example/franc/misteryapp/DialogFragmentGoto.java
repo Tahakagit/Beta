@@ -28,17 +28,13 @@ import io.realm.RealmResults;
 
 public class DialogFragmentGoto extends Fragment {
     static Spinner spinner;
-    Realm realm;
-    static RealmResults<LocationRealmObject> realmSelect;
-    static String contos;
+    static Realm realm;
+    static String starSystem;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realm = Realm.getDefaultInstance();
-        realmSelect = realm.where(LocationRealmObject.class).findAllAsync();
-
-
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,34 +44,21 @@ public class DialogFragmentGoto extends Fragment {
 
     }
 
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         Button next;
         Button prev;
-        List<String> arraylist = retrieve();
-
         next = view.findViewById(R.id.next);
         prev = view.findViewById(R.id.prev);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, arraylist);
-        spinner = view.findViewById(R.id.location_spinner);
-        spinner.setAdapter(dataAdapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-/*
-                contos = view.toString();
-*/
-                contos =  parent.getItemAtPosition(position).toString();
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
+
+        final List<String> arraylist = retrieve();
+
+        getStarFromSpinner(arraylist, view);
 
         next.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
 
 
-                ((DialogActivity)getActivity()).getLocation(contos);
+                ((DialogActivity)getActivity()).getLocation(getStarFromSpinner(arraylist, view));
 
 
             }
@@ -93,6 +76,23 @@ public class DialogFragmentGoto extends Fragment {
 
     }
 
+    // start spinner
+    public String getStarFromSpinner(List<String> starSystems, View view){
+        // passa una lista di tutti gli starsystem
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, starSystems);
+        spinner = view.findViewById(R.id.location_spinner);
+        spinner.setAdapter(dataAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                starSystem =  parent.getItemAtPosition(position).toString();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        return starSystem;
+    }
 
     public List<String> retrieve()
     {

@@ -23,14 +23,7 @@ public class DialogActivity extends AppCompatActivity {
 
     static Button next;
     static Button prev;
-    static String beneficiario2 = null;
-    static String importo2 = null;
-    static String scadenza2 = null;
     static String conto2 = null;
-    static String tipo2 = null;
-    static String direzione2 = null;
-
-    private sendLocationIface sendIface;
 
 
     @Override

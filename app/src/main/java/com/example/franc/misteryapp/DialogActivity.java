@@ -15,15 +15,14 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class DialogActivity extends AppCompatActivity {
+public class DialogActivity extends AppCompatActivity implements DialogFragmentGoto.SendToDialogActivity {
 
     static int i = 0;
     final FragmentManager fragmentManager = getSupportFragmentManager();
     final ArrayList<Fragment> fragments = new ArrayList <>();
 
     static Button next;
-    static Button prev;
-    static String conto2 = null;
+    static String starSystem = null;
 
     RealmHelper helper;
 
@@ -33,7 +32,6 @@ public class DialogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialog);
         next = findViewById(R.id.next);
-        prev = findViewById(R.id.prev);
 
         helper = new RealmHelper(this);
 
@@ -51,42 +49,12 @@ public class DialogActivity extends AppCompatActivity {
 
     }
 
-    //ON PREV PRESS
-    public void goBack(){
-        --i;
-        FragmentTransaction ft2 = fragmentManager.beginTransaction();
-        ft2.replace(R.id.fragmentcontainer, fragments.get(i));
-        ft2.addToBackStack(null);
-        ft2.commit();
-    }
-
-
-
-
-    //ON NEXT PRESS RECUPERA DATI
-    public void getLocation(String star) {
-        conto2 = star;
-        helper.setPlayerLocation(conto2);
-        NavigationActivity.navigationAdapter.UpdateAdapter(helper.getPlacesAtPLayerPosition());
+    @Override
+    public void sendStuff(String star) {
+        starSystem = star;
+        helper.setPlayerLocation(starSystem);
         i = 0;
         finish();
 
     }
-
-    //todo interfacciarsi con navigation activity
-    public interface sendLocationIface{
-        void sendLocation(String location);
-    }
-
-
-
-    public void EndDialogActivity(){
-
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Toast.makeText(DialogActivity.this, "Oncreateview", Toast.LENGTH_SHORT);
-    }
-
 }

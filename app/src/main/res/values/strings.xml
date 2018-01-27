@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">MisteryApp</string>
     <string name="generic_ok">OK</string>
+    <string name="generic_go">GO</string>
+
     <string name="title_activity_navigation">NavigationActivity</string>
 </resources>

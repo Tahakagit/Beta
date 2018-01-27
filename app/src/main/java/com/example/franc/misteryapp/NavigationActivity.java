@@ -22,14 +22,18 @@ import io.realm.RealmResults;
 
 public class NavigationActivity extends AppCompatActivity {
 
-    // trova la location del player
-    // esegue una query delle location con filtro location player stella
-    // passa il result a MyNavigationAdapter
+    /**
+     *
+     *  Show player current starsystem's locations and ships
+     *
+     * */
+
     static String playerLocation;
-    BroadcastReceiver  act2InitReceiver;
     static RealmHelper helper;
     static MyNavigationAdapter navigationAdapter;
     static WorldManagementHelper worldHelper;
+    static RealmResults<LocationRealmObject> listOfLocations;
+
     static Player  player = null;
     Realm mRealm = null;
 
@@ -125,40 +129,14 @@ public class NavigationActivity extends AppCompatActivity {
         return true;
     }
 
-
+    // aggiorna la lista di location
     @Override
     protected void onResume() {
         super.onResume();
-/*
         listOfLocations = helper.getPlacesAtPLayerPosition();
-
-        navigationAdapter = new MyNavigationAdapter(listOfLocations);
-        navigationAdapter.notifyDataSetChanged();
-*/
+        navigationAdapter.UpdateAdapter(listOfLocations);
     }
 
-    static RealmResults<LocationRealmObject> listOfLocations;
-
-    // ritorna realmresult di location con stella in comune
-    public void getLocation(){
-        helper.getPlayerLocation();
-        playerLocation = helper.getPlayerLocation();
-        listOfLocations = helper.getPlacesAtPLayerPosition();
-        listOfLocations.addChangeListener(new RealmChangeListener<RealmResults<LocationRealmObject>>() {
-            @Override
-            public void onChange(RealmResults<LocationRealmObject> locationRealmObjects) {
-                navigationAdapter.notifyDataSetChanged();
-            }
-        });
-
-    }
-
-/*
-    @Override
-    public void sendLocation(String location) {
-        startRecyclerView(helper.getLocationsAtStar(location));
-    }
-*/
 
     public void startRecyclerView(){
         navigationAdapter = new MyNavigationAdapter(listOfLocations);
@@ -205,7 +183,6 @@ public class NavigationActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(act2InitReceiver);
 
     }
 }

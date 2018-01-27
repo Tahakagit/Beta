@@ -1,5 +1,6 @@
 package com.example.franc.misteryapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,11 +31,19 @@ public class DialogFragmentGoto extends Fragment {
     static Spinner spinner;
     static Realm realm;
     static String starSystem;
+    static SendToDialogActivity iface;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         realm = Realm.getDefaultInstance();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        iface = (SendToDialogActivity) context;
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,39 +53,27 @@ public class DialogFragmentGoto extends Fragment {
 
     }
 
-    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
-        Button next;
-        Button prev;
-        next = view.findViewById(R.id.next);
-        prev = view.findViewById(R.id.prev);
 
+
+
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+        final Button next = view.findViewById(R.id.next);
         final List<String> arraylist = retrieve();
 
         getStarFromSpinner(arraylist, view);
 
         next.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-
-
-                ((DialogActivity)getActivity()).getLocation(getStarFromSpinner(arraylist, view));
-
-
+                iface.sendStuff(getStarFromSpinner(arraylist, view));
             }
         } );
-
-        prev.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-
-                ((DialogActivity)getActivity()).goBack();
-
-            }
-        } );
-
-
-
+    }
+    public interface SendToDialogActivity{
+        public void sendStuff(String starSystem);
     }
 
-    // start spinner
+
+    // start spinner and return selected starsystem
     public String getStarFromSpinner(List<String> starSystems, View view){
         // passa una lista di tutti gli starsystem
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, starSystems);

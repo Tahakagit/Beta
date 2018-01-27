@@ -23,14 +23,7 @@
 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="PREV"
-                android:id="@+id/prev"
-                android:layout_weight=".50"
-                />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="NEXT"
+                android:text="@string/generic_go"
                 android:id="@+id/next"
                 android:layout_weight=".50"
                 />

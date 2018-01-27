@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -19,14 +18,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.OnItemSelectedListener, MyEnemyAdapter.OnItemDeselectedListener{
+public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.OnItemSelectedListener, MyEnemyAdapter.OnItemDeselectedListener{
     TextView io;
     TextView weaponReload;
     Realm mRealm = null;
-    static RealmHelper helper = new RealmHelper();
+    static RealmHelper helper;
     static Player  getPlayer = null;
     static MyEnemyAdapter enemyAdapter;
     static MyWeaponsAdapter weaponsAdapter;
@@ -51,14 +49,17 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigation_drawer);
+        helper = new RealmHelper(this);
+/*
         Realm.init(this);
+*/
         io = (TextView)findViewById(R.id.health);
 
         mEnemies = generateEnemies(2);
-        enemyAdapter = new MyEnemyAdapter(mEnemies, MainActivity.this);
+        enemyAdapter = new MyEnemyAdapter(mEnemies, BattleActivity.this);
 
         weapons = generateWeapons(25);
-        weaponsAdapter = new MyWeaponsAdapter(weapons);
+        weaponsAdapter = new MyWeaponsAdapter(weapons, helper);
 
         startNavDrawer();
         //crea Realmobject Player se non esiste e ricarica energia
@@ -176,7 +177,6 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
 
     // inserisce N armi e ne restituisce il RealmResult
     public RealmResults<WeaponSet> generateWeapons(int weaponsNumber){
-        final RealmHelper helper = new RealmHelper();
         helper.resetWeapons();
         for (int i = 0 ; i < weaponsNumber ; i++){
             WeaponSet weapons = new WeaponSet();
@@ -239,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
         @Override
         protected Void doInBackground(Enemy... arg0) {
             final Player player;
-            final RealmHelper helper = new RealmHelper();
 
             player = helper.getPlayer();
 
@@ -333,7 +332,6 @@ public class MainActivity extends AppCompatActivity implements MyEnemyAdapter.On
     // thread per il tempo di caricamento delle arrmi
     private class reloadTask extends AsyncTask<MyWeaponsAdapter.ViewHolder, Void, Void> {
 
-        RealmHelper helper = new RealmHelper();
         MyWeaponsAdapter.ViewHolder currentHolder;
 
         void Sleep(int ms){

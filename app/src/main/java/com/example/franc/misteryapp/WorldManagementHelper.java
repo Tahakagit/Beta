@@ -11,11 +11,14 @@ import io.realm.Realm;
 
 public class WorldManagementHelper {
     private Realm mRealm;
-    RealmHelper helper;
+    private RealmHelper helper;
+
+    public WorldManagementHelper(RealmHelper helper) {
+        this.helper = helper;
+    }
 
     public void startUniverse(){
-        helper = new RealmHelper();
-        helper.resetUniverse();
+        this.helper.resetUniverse();
         // creare routine di inserimento delle location
         for (int i = 0; i < 4; i++) {
             String sectorName = "Sector - " + randomIdentifier();
@@ -27,7 +30,7 @@ public class WorldManagementHelper {
                     location.setLocationName(locationName);
                     location.setLocationStar(starName);
                     location.setLocationSector(sectorName);
-                    helper.addItem(location);
+                    this.helper.addItem(location);
 
                 }
             }

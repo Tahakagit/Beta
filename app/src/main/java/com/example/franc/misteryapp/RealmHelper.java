@@ -1,5 +1,6 @@
 package com.example.franc.misteryapp;
 
+import android.content.Context;
 import android.webkit.WebMessagePort;
 
 import io.realm.Realm;
@@ -13,7 +14,9 @@ import io.realm.RealmResults;
 public class RealmHelper {
 
     private Realm mRealm;
-    public RealmHelper() {}
+    public RealmHelper(Context context) {
+        Realm.init(context);
+    }
 
     public Player getPlayer(){
 
@@ -40,12 +43,14 @@ public class RealmHelper {
     public String getPlayerLocation(){
 
         String position;
-        mRealm = Realm.getDefaultInstance();
-        Player getPlayer = mRealm.where(Player.class).findAll().first();
-        position = getPlayer.getLocation();
-        mRealm.close();
+        try {
+            mRealm = Realm.getDefaultInstance();
+            Player getPlayer = mRealm.where(Player.class).findAll().first();
+            position = getPlayer.getLocation();
+        } finally {
+            mRealm.close();
+        }
         return position;
-
     }
 
     public void setPlayerLocation(final String firstStar){
@@ -66,11 +71,14 @@ public class RealmHelper {
 
     public RealmResults<LocationRealmObject> getPlacesAtPLayerPosition(){
 
-        mRealm = Realm.getDefaultInstance();
+        RealmResults<LocationRealmObject> listOfPlaces;
+        try {
+            mRealm = Realm.getDefaultInstance();
+            listOfPlaces = mRealm.where(LocationRealmObject.class).equalTo("locationStar", getPlayerLocation()).findAll();
+        } finally {
+            mRealm.close();
+        }
 
-        RealmResults<LocationRealmObject> listOfPlaces= mRealm.where(LocationRealmObject.class).equalTo("locationStar", getPlayerLocation()).findAll();
-
-        mRealm.close();
         return listOfPlaces;
     }
 

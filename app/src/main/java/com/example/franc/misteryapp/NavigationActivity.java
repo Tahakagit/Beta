@@ -1,20 +1,15 @@
 package com.example.franc.misteryapp;
 
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -32,16 +27,23 @@ public class NavigationActivity extends AppCompatActivity {
     // passa il result a MyNavigationAdapter
     static String playerLocation;
     BroadcastReceiver  act2InitReceiver;
-    RealmHelper helper = new RealmHelper();
+    static RealmHelper helper;
     static MyNavigationAdapter navigationAdapter;
-    WorldManagementHelper worldHelper = new WorldManagementHelper();
+    static WorldManagementHelper worldHelper;
+    static Player  player = null;
+    Realm mRealm = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigation_drawer_exploring);
+        helper = new RealmHelper(this);
+        worldHelper = new WorldManagementHelper(helper);
         worldHelper.startUniverse();
 
 
+        isPlayer();
         playerLocation = helper.getPlayerLocation();
         if (playerLocation == null)
             helper.setPlayerLocation(helper.getFirstStar());
@@ -69,7 +71,7 @@ public class NavigationActivity extends AppCompatActivity {
     //NAVIGATION DRAWER
     public void startNavDrawer(){
         final DrawerLayout mDrawerLayout;
-        final Intent creaConto = new Intent(this, MainActivity.class);
+        final Intent creaConto = new Intent(this, BattleActivity.class);
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -98,6 +100,29 @@ public class NavigationActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    // inizializza il Player
+    public boolean isPlayer(){
+        //todo ritorna il player
+
+        mRealm = Realm.getDefaultInstance();
+
+        try {
+            player = mRealm.where(Player.class).findAllAsync().first();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (player == null){
+            Player player = new Player();
+            helper.addItem(player);
+        }else {
+            helper.resetLocation();
+            helper.restoreHealth(player);
+        }
+        mRealm.close();
+        return true;
     }
 
 

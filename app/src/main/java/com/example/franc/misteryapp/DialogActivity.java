@@ -25,6 +25,8 @@ public class DialogActivity extends AppCompatActivity {
     static Button prev;
     static String conto2 = null;
 
+    RealmHelper helper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,9 @@ public class DialogActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dialog);
         next = findViewById(R.id.next);
         prev = findViewById(R.id.prev);
+
+        helper = new RealmHelper(this);
+
 
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -60,7 +65,6 @@ public class DialogActivity extends AppCompatActivity {
 
     //ON NEXT PRESS RECUPERA DATI
     public void getLocation(String star) {
-        RealmHelper helper = new RealmHelper();
         conto2 = star;
         helper.setPlayerLocation(conto2);
         NavigationActivity.navigationAdapter.UpdateAdapter(helper.getPlacesAtPLayerPosition());

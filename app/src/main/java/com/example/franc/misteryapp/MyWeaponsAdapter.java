@@ -32,6 +32,7 @@ import io.realm.RealmResults;
 
 public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.ViewHolder> {
     private RealmResults<WeaponSet> mDataset;
+    private RealmHelper helper;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -58,8 +59,9 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
 
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyWeaponsAdapter(RealmResults<WeaponSet> myDataset) {
+    public MyWeaponsAdapter(RealmResults<WeaponSet> myDataset, RealmHelper helper) {
 
+        this.helper = helper;
         mDataset = myDataset;
     }
 
@@ -100,7 +102,6 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
 
 
     public int deleteItemAt(int position){
-        RealmHelper helper = new RealmHelper();
         int weaponPower;
 
         //ho la posizione della lista

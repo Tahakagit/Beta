@@ -13,6 +13,7 @@ public class LocationRealmObject extends RealmObject {
     private String locationName = null;
     private String locationStar = null;
     private String locationSector = null;
+    private int locationId = 0;
 
     public String getLocationName() {
         return locationName;
@@ -36,5 +37,13 @@ public class LocationRealmObject extends RealmObject {
 
     public void setLocationSector(String locationSector) {
         this.locationSector = locationSector;
+    }
+
+    public int getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(int locationId) {
+        this.locationId = locationId;
     }
 }

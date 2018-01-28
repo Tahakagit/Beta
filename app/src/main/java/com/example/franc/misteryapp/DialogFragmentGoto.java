@@ -1,10 +1,7 @@
 package com.example.franc.misteryapp;
 
-import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,15 +10,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -64,12 +56,12 @@ public class DialogFragmentGoto extends Fragment {
 
         next.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                iface.sendStuff(getStarFromSpinner(arraylist, view));
+                iface.navigateTo(getStarFromSpinner(arraylist, view));
             }
         } );
     }
     public interface SendToDialogActivity{
-        public void sendStuff(String starSystem);
+        public void navigateTo(String starSystem);
     }
 
 

@@ -1,5 +1,7 @@
 package com.example.franc.misteryapp;
 
+import android.util.Log;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,7 +22,10 @@ public class WorldManagementHelper {
     public void startUniverse(){
         this.helper.resetUniverse();
         // creare routine di inserimento delle location
+        int z = 1;
+
         for (int i = 0; i < 4; i++) {
+
             String sectorName = "Sector - " + randomIdentifier();
             for (int u = 0 ; u < 2 ; u++){
                 String starName = "Star - " + randomIdentifier();
@@ -30,8 +35,9 @@ public class WorldManagementHelper {
                     location.setLocationName(locationName);
                     location.setLocationStar(starName);
                     location.setLocationSector(sectorName);
+                    location.setLocationId(z);
                     this.helper.addItem(location);
-
+                    z++;
                 }
             }
 
@@ -55,6 +61,18 @@ public class WorldManagementHelper {
             }
         }
         return builder.toString();
+    }
+
+    public void spawnEnemy(){
+
+        AllEnemies enemy = new AllEnemies();
+        enemy.setName("ship - " + randomIdentifier());
+        enemy.setLocation(helper.getRandomLocation());
+        helper.addItem(enemy);
+        Log.d("tag", "Spawning new enemy at   " + enemy.getLocation());
+
+
+
     }
 
 }

@@ -3,6 +3,8 @@ package com.example.franc.misteryapp;
 import android.content.Context;
 import android.webkit.WebMessagePort;
 
+import java.util.Random;
+
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
@@ -14,17 +16,27 @@ import io.realm.RealmResults;
 public class RealmHelper {
 
     private Realm mRealm;
-    public RealmHelper(Context context) {
-        Realm.init(context);
+    public RealmHelper() {
     }
 
     public Player getPlayer(){
 
+        final Player[] player = new Player[1];
+
         mRealm = Realm.getDefaultInstance();
-        Player getPlayer = mRealm.where(Player.class).findAll().first();
-        return getPlayer;
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+
+                player[0] = realm.where(Player.class).findAll().first();
+
+            }
+        });
+
+        return player[0];
 
     }
+
     public void resetLocation(){
         String position;
         mRealm = Realm.getDefaultInstance();
@@ -40,6 +52,23 @@ public class RealmHelper {
         mRealm.close();
 
     }
+
+    public void resetEnemies(){
+        String position;
+        mRealm = Realm.getDefaultInstance();
+        final RealmResults<AllEnemies> getEnemies = mRealm.where(AllEnemies.class).findAll();
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                getEnemies.deleteAllFromRealm();
+            }
+        });
+
+        mRealm.close();
+
+    }
+
+
     public String getPlayerLocation(){
 
         String position;
@@ -68,6 +97,28 @@ public class RealmHelper {
 
     }
 
+    public String getRandomLocation(){
+        Random r = new Random();
+
+        String randomStarSystem;
+        try {
+            mRealm = Realm.getDefaultInstance();
+            int getSize = mRealm.where(LocationRealmObject.class).findAll().size();
+            int Low = 10;
+            int High = getSize;
+            int Result = r.nextInt(High-Low) + Low;
+
+            RealmResults<LocationRealmObject> all = mRealm.where(LocationRealmObject.class).findAll();
+            RealmResults<LocationRealmObject> location = mRealm.where(LocationRealmObject.class).equalTo("locationId", Result).findAll();
+            randomStarSystem = location.get(0).getLocationStar();
+        } finally {
+            mRealm.close();
+
+        }
+        return randomStarSystem;
+
+    }
+
 
     public RealmResults<LocationRealmObject> getPlacesAtPLayerPosition(){
 
@@ -81,6 +132,21 @@ public class RealmHelper {
 
         return listOfPlaces;
     }
+
+    public RealmResults<AllEnemies> getEnemiesAtPLayerPosition(){
+
+        RealmResults<AllEnemies> listOfEnemies;
+        try {
+            mRealm = Realm.getDefaultInstance();
+            listOfEnemies = mRealm.where(AllEnemies.class).equalTo("location", getPlayerLocation()).findAll();
+        } finally {
+            mRealm.close();
+        }
+
+
+        return listOfEnemies;
+    }
+
 
     public int getPlayerHealth(){
 
@@ -122,15 +188,14 @@ public class RealmHelper {
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    RealmResults<LocationRealmObject> getWeapons = mRealm.where(LocationRealmObject.class).findAll();
-                    getWeapons.deleteAllFromRealm();
+                    RealmResults<LocationRealmObject> allLocations = mRealm.where(LocationRealmObject.class).findAll();
+                    allLocations.deleteAllFromRealm();
 
                 }
             });
 
         } finally {
             mRealm.close();
-
         }
 
     }
@@ -142,7 +207,6 @@ public class RealmHelper {
         return getWeapons;
 
     }
-
 
     public int removeWeapondAt(int index){
 
@@ -201,7 +265,6 @@ public class RealmHelper {
         }
     }
 
-
     public void restoreHealth(final Player item){
 
         try {
@@ -240,7 +303,6 @@ public class RealmHelper {
         }
     }
 
-
     public void dealDamage(final Player item, final int damage){
 
         try {
@@ -275,7 +337,6 @@ public class RealmHelper {
             }
         }
     }
-
 
     public RealmResults retrieveAllItem(){
 

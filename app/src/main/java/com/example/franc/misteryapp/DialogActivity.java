@@ -33,7 +33,7 @@ public class DialogActivity extends AppCompatActivity implements DialogFragmentG
         setContentView(R.layout.activity_dialog);
         next = findViewById(R.id.next);
 
-        helper = new RealmHelper(this);
+        helper = new RealmHelper();
 
 
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -50,9 +50,10 @@ public class DialogActivity extends AppCompatActivity implements DialogFragmentG
     }
 
     @Override
-    public void sendStuff(String star) {
+    public void navigateTo(String star) {
         starSystem = star;
         helper.setPlayerLocation(starSystem);
+        NavigationActivity.navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
         i = 0;
         finish();
 

@@ -1,16 +1,16 @@
 package com.example.franc.misteryapp;
 
-import android.os.Handler;
+import io.realm.RealmObject;
 
 /**
- * Created by franc on 14/01/2018.
+ * Created by franc on 27/01/2018.
  */
 
-public class Enemy{
+public class AllEnemies extends RealmObject {
 
     private String name = null;
     private int health = 20;
-    private boolean isAdded = false;
+    private String location = null;
     private boolean isSelected = false;
 
     public int getHealth() {
@@ -39,5 +39,13 @@ public class Enemy{
 
     public void getDamage(int damage){
         this.health = this.health - damage;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

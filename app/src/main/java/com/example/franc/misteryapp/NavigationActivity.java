@@ -1,13 +1,15 @@
 package com.example.franc.misteryapp;
 
-import android.content.BroadcastReceiver;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -15,6 +17,8 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+
+import java.util.Calendar;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
@@ -28,11 +32,16 @@ public class NavigationActivity extends AppCompatActivity {
      *
      * */
 
+
     static String playerLocation;
     static RealmHelper helper;
     static MyNavigationAdapter navigationAdapter;
+    static MyNavigationEnemyAdapter navigationEnemyAdapter;
     static WorldManagementHelper worldHelper;
     static RealmResults<LocationRealmObject> listOfLocations;
+    static RealmResults<AllEnemies> listOfEnemies;
+
+    static SpawnEnemyService enemyService;
 
     static Player  player = null;
     Realm mRealm = null;
@@ -42,11 +51,13 @@ public class NavigationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigation_drawer_exploring);
-        helper = new RealmHelper(this);
+        helper = new RealmHelper();
         worldHelper = new WorldManagementHelper(helper);
         worldHelper.startUniverse();
 
+        mRealm = Realm.getDefaultInstance();
 
+        helper.resetEnemies();
         isPlayer();
         playerLocation = helper.getPlayerLocation();
         if (playerLocation == null)
@@ -54,22 +65,24 @@ public class NavigationActivity extends AppCompatActivity {
 
 
         listOfLocations = helper.getPlacesAtPLayerPosition();
-
+        listOfEnemies = mRealm.where(AllEnemies.class).findAll();
         listOfLocations.addChangeListener(new RealmChangeListener<RealmResults<LocationRealmObject>>() {
             @Override
             public void onChange(RealmResults<LocationRealmObject> locationRealmObjects) {
                 navigationAdapter.notifyDataSetChanged();
             }
         });
-
-
-        startRecyclerView();
-
-
-
+        startEnemyLifeService();
+        startLocationsRecyclerView();
+        startEnemiesRecyclerView();
         startFab();
-
         startNavDrawer();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     //NAVIGATION DRAWER
@@ -129,21 +142,51 @@ public class NavigationActivity extends AppCompatActivity {
         return true;
     }
 
-    // aggiorna la lista di location
-    @Override
-    protected void onResume() {
-        super.onResume();
-        listOfLocations = helper.getPlacesAtPLayerPosition();
-        navigationAdapter.UpdateAdapter(listOfLocations);
+    public void startEnemyLifeService(){
+        Context ctx = getApplicationContext();
+/** this gives us the time for the first trigger.  */
+        Calendar cal = Calendar.getInstance();
+        AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+        long interval = 2000; // 5 minutes in milliseconds
+        Intent serviceIntent = new Intent(ctx, SpawnEnemyService.class);
+// make sure you **don't** use *PendingIntent.getBroadcast*, it wouldn't work
+        PendingIntent servicePendingIntent =
+                PendingIntent.getService(ctx,
+                        SpawnEnemyService.SERVICE_ID, // integer constant used to identify the service
+                        serviceIntent,
+                        PendingIntent.FLAG_CANCEL_CURRENT);  // FLAG to avoid creating a second service if there's already one running
+// there are other options like setInexactRepeating, check the docs
+        am.setRepeating(
+                AlarmManager.RTC_WAKEUP,//type of alarm. This one will wake up the device when it goes off, but there are others, check the docs
+                cal.getTimeInMillis(),
+                interval,
+                servicePendingIntent
+        );
+
     }
 
-
-    public void startRecyclerView(){
+    public void startLocationsRecyclerView(){
         navigationAdapter = new MyNavigationAdapter(listOfLocations);
         RecyclerView list;
-        list = (RecyclerView)findViewById(R.id.navigation_rv);
+        list = (RecyclerView)findViewById(R.id.navigation_rv_locations);
         list.setLayoutManager(new LinearLayoutManager(this));
         list.setAdapter(navigationAdapter);
+
+    }
+
+    public void startEnemiesRecyclerView(){
+        navigationEnemyAdapter = new MyNavigationEnemyAdapter(helper.getEnemiesAtPLayerPosition());
+        RecyclerView list;
+        list = (RecyclerView)findViewById(R.id.navigation_rv_enemies);
+        list.setLayoutManager(new GridLayoutManager(this, 4));
+        list.setAdapter(navigationEnemyAdapter);
+        listOfEnemies.addChangeListener(new RealmChangeListener<RealmResults<AllEnemies>>() {
+            @Override
+            public void onChange(RealmResults<AllEnemies> allEnemies) {
+
+                navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
+            }
+        });
 
     }
 

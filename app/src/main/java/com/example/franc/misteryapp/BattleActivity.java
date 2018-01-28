@@ -49,7 +49,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigation_drawer);
-        helper = new RealmHelper(this);
+        helper = new RealmHelper();
 /*
         Realm.init(this);
 */

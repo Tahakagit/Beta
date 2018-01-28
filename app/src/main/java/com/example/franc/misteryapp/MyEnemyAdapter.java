@@ -98,12 +98,13 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
             @Override
             public void onClick(View view) {
 
-                if (mDataset.get(position).isSelected()){
+                if (holder.isSelected != true){
                     holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.cardview_light_background));
-
+                    holder.isSelected = true;
                     iface2.onItemDeselected(mDataset.get(position));
                 }else {
                     holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.colorAccent));
+                    holder.isSelected = false;
                     iface.onItemSelected(mDataset.get(position));
 /*
                     holder.isSelected = false;

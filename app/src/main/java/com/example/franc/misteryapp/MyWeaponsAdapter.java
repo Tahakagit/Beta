@@ -105,7 +105,7 @@ public class MyWeaponsAdapter extends RecyclerView.Adapter<MyWeaponsAdapter.View
         int weaponPower;
 
         //ho la posizione della lista
-        weaponPower = helper.removeWeapondAt(position);
+        weaponPower = helper.removeWeaponAt(position);
 
         notifyItemRangeRemoved(position, 1);
         //query realm results alla posizione

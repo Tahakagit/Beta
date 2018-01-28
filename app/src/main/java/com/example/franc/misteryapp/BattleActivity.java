@@ -1,5 +1,8 @@
 package com.example.franc.misteryapp;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
@@ -13,6 +16,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +33,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     static Player  getPlayer = null;
     static MyEnemyAdapter enemyAdapter;
     static MyWeaponsAdapter weaponsAdapter;
+    static Context context;
 
     //variabili per la generazione delle stringhe casuali
 
@@ -52,6 +57,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         setContentView(R.layout.navigation_drawer);
         helper = new RealmHelper();
         EnemyQueue enemyQueue = new EnemyQueue();
+        context = this;
 
 /*
         Realm.init(this);
@@ -70,7 +76,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         //crea Realmobject Player se non esiste e ricarica energia
         isPlayer();
 
-        startThreads(enemyQueue.getEnemyBuffer());
+        startThreads(helper.getEnemyQueue());
         listWeapons = findViewById(R.id.rv_weapons);
 
         list = (RecyclerView)findViewById(R.id.rv);
@@ -157,8 +163,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         return true;
     }
 
-    // riceve arraylist di Enemy e per ognuno avvia un thread
-    // todo deve cessare al termine dell'activity
+    // riceve enemies e per ognuno avvia un thread
     public void startThreads(RealmList<AllEnemies> enemies){
         for (AllEnemies res:enemies) {
             new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, res);
@@ -222,16 +227,19 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     @Override
     public void onItemDeselected(AllEnemies item) {
         selectedEnemies.remove(item);
+        helper.setEnemyUnselected(item);
     }
 
     @Override
     public void onItemSelected(AllEnemies item) {
         selectedEnemies.add(item);
+        helper.setEnemySelected(item);
     }
 
 
     // thread per il comportamento del nemico
     private class BackgroundTask extends AsyncTask<AllEnemies, Integer, Void>{
+
 
         void Sleep(int ms){
             try{
@@ -242,14 +250,19 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         }
 
         @Override
-        protected Void doInBackground(AllEnemies... arg0) {
+        protected Void doInBackground(final AllEnemies... arg0) {
             final Player player;
+            final AllEnemies enemies;
 
+            int enemyHealth;
             player = helper.getPlayer();
+            final Realm backgroundRealm = Realm.getDefaultInstance();
+            //
+            while (helper.getEnemyHealth() > 0) {
 
-            while (arg0[0].getHealth() > 0 && helper.getPlayerHealth() > 0) {
-
+/*
                     Log.i("MainACtivity", arg0[0].getName() + " attacca");
+*/
                     try {
                         helper.dealDamage(player, 2);
                         int salute = player.getHealth();
@@ -259,6 +272,42 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
                     }
                     Sleep(2000);
 
+            }
+            if (helper.getEnemyHealth() > 0 || helper.getPlayerHealth() > 0){
+
+                if (arg0[0].getHealth() <= 0){
+                    AlertDialog.Builder miaAlert = new AlertDialog.Builder(getParent());
+/*
+                    miaAlert.setTitle("AlertDialog di MrWebMaster");
+*/
+                    miaAlert.setMessage("morto");
+                    AlertDialog alert = miaAlert.create();
+                    alert.show();
+                    miaAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            finish();
+                        }
+                    });
+
+                }else if (helper.getPlayerHealth() <= 0){
+
+                    AlertDialog.Builder miaAlert = new AlertDialog.Builder(getParent());
+/*
+                    miaAlert.setTitle("AlertDialog di MrWebMaster");
+*/
+                    miaAlert.setMessage("morto");
+                    AlertDialog alert = miaAlert.create();
+                    alert.show();
+
+                    miaAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            finish();
+                        }
+                    });
+
+                }
             }
             return null;
         }

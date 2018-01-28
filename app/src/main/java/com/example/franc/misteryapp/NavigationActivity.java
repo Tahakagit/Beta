@@ -40,6 +40,7 @@ public class NavigationActivity extends AppCompatActivity {
     static WorldManagementHelper worldHelper;
     static RealmResults<LocationRealmObject> listOfLocations;
     static RealmResults<AllEnemies> listOfEnemies;
+    static Context context;
 
     static SpawnEnemyService enemyService;
 
@@ -55,6 +56,7 @@ public class NavigationActivity extends AppCompatActivity {
         worldHelper = new WorldManagementHelper(helper);
         worldHelper.startUniverse();
 
+        context = this;
         mRealm = Realm.getDefaultInstance();
 
         helper.resetEnemies();

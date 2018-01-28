@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.OnItemSelectedListener, MyEnemyAdapter.OnItemDeselectedListener{
@@ -37,7 +38,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     static RecyclerView listWeapons;
 
     static ArrayList<Enemy> mEnemies = new ArrayList<>();
-    static ArrayList<Enemy> selectedEnemies = new ArrayList();
+    static RealmList<AllEnemies> selectedEnemies = new RealmList<>();
 
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.LayoutManager mLayoutManagerWeapons;
@@ -50,13 +51,17 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigation_drawer);
         helper = new RealmHelper();
+        EnemyQueue enemyQueue = new EnemyQueue();
+
 /*
         Realm.init(this);
 */
         io = (TextView)findViewById(R.id.health);
 
+/*
         mEnemies = generateEnemies(2);
-        enemyAdapter = new MyEnemyAdapter(mEnemies, BattleActivity.this);
+*/
+        enemyAdapter = new MyEnemyAdapter(helper.getEnemyQueue(), BattleActivity.this);
 
         weapons = generateWeapons(25);
         weaponsAdapter = new MyWeaponsAdapter(weapons, helper);
@@ -65,7 +70,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         //crea Realmobject Player se non esiste e ricarica energia
         isPlayer();
 
-        startThreads(mEnemies);
+        startThreads(enemyQueue.getEnemyBuffer());
         listWeapons = findViewById(R.id.rv_weapons);
 
         list = (RecyclerView)findViewById(R.id.rv);
@@ -154,8 +159,8 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
     // riceve arraylist di Enemy e per ognuno avvia un thread
     // todo deve cessare al termine dell'activity
-    public void startThreads(ArrayList<Enemy> enemies){
-        for (Enemy res:enemies) {
+    public void startThreads(RealmList<AllEnemies> enemies){
+        for (AllEnemies res:enemies) {
             new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, res);
 
         }
@@ -215,18 +220,18 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
     //rimuove dai selezionati l'elemento deselezionato
     @Override
-    public void onItemDeselected(Enemy item) {
+    public void onItemDeselected(AllEnemies item) {
         selectedEnemies.remove(item);
     }
 
     @Override
-    public void onItemSelected(Enemy item) {
+    public void onItemSelected(AllEnemies item) {
         selectedEnemies.add(item);
     }
 
 
     // thread per il comportamento del nemico
-    private class BackgroundTask extends AsyncTask<Enemy, Integer, Void>{
+    private class BackgroundTask extends AsyncTask<AllEnemies, Integer, Void>{
 
         void Sleep(int ms){
             try{
@@ -237,7 +242,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         }
 
         @Override
-        protected Void doInBackground(Enemy... arg0) {
+        protected Void doInBackground(AllEnemies... arg0) {
             final Player player;
 
             player = helper.getPlayer();
@@ -305,7 +310,11 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
             int power = weaponsAdapter.deleteItemAt(position);
 
             // danneggia il selezionato
+/*
             selectedEnemies.get(0).getDamage(power);
+*/
+
+            helper.dealEnemyDamage(selectedEnemies.get(0), power);
 
             // se il nemico è morto
             if (selectedEnemies.get(0).getHealth() <= 0){

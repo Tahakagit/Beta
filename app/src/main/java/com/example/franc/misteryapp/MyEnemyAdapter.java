@@ -30,8 +30,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import io.realm.RealmList;
+
 public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHolder> {
-    private ArrayList<Enemy> mDataset;
+    private RealmList<AllEnemies> mDataset;
     private OnItemSelectedListener iface;
     private OnItemDeselectedListener iface2;
     Activity activity;
@@ -63,7 +65,7 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyEnemyAdapter(ArrayList<Enemy> myDataset, Activity activity) {
+    public MyEnemyAdapter(RealmList<AllEnemies> myDataset, Activity activity) {
         mDataset = myDataset;
         this.activity = activity;
         this.iface = (OnItemSelectedListener) activity;
@@ -98,11 +100,10 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
 
                 if (mDataset.get(position).isSelected()){
                     holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.cardview_light_background));
-                    mDataset.get(position).setSelected(false);
+
                     iface2.onItemDeselected(mDataset.get(position));
                 }else {
                     holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.colorAccent));
-                    mDataset.get(position).setSelected(true);
                     iface.onItemSelected(mDataset.get(position));
 /*
                     holder.isSelected = false;
@@ -114,13 +115,13 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
     }
     public interface OnItemDeselectedListener {
 
-        void onItemDeselected(Enemy item);
+        void onItemDeselected(AllEnemies item);
     }
 
 
     public interface OnItemSelectedListener {
 
-        void onItemSelected(Enemy item);
+        void onItemSelected(AllEnemies item);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

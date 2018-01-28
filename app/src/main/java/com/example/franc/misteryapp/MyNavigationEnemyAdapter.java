@@ -1,11 +1,14 @@
 package com.example.franc.misteryapp;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -77,6 +80,50 @@ public class MyNavigationEnemyAdapter extends RecyclerView.Adapter<MyNavigationE
         // - replace the contents of the view with that element
         holder.mCardView.setText(mDataset.get(position).getName());
 
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener(){
+
+            @Override
+            public boolean onLongClick(View view) {
+                //creating a popup menu
+                PopupMenu popup = new PopupMenu(NavigationActivity.context, holder.itemView);
+                //inflating menu from xml resource
+                popup.inflate(R.menu.option_menu_enemy);
+                //adding click listener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.menu1:
+                                final Intent attackEnemy = new Intent(NavigationActivity.context, BattleActivity.class);
+                                EnemyQueue queue = new EnemyQueue();
+                                RealmHelper helper = new RealmHelper();
+                                queue.setExist(1);
+                                queue.setEnemyBuffer(mDataset.get(position));
+                                helper.addItem(queue);
+                                NavigationActivity.context.startActivity(attackEnemy);
+
+/*
+                                queue.setEnemyBuffer(mDataset.get(position));
+*/
+                                break;
+                            case R.id.menu2:
+                                //handle menu2 click
+                                break;
+                            case R.id.menu3:
+                                //handle menu3 click
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                //displaying the popup
+                popup.show();
+                return false;
+            }
+
+        });
 
     }
 

@@ -6,6 +6,7 @@ import android.webkit.WebMessagePort;
 import java.util.Random;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 
@@ -65,6 +66,49 @@ public class RealmHelper {
         });
 
         mRealm.close();
+
+    }
+
+    public  void addEnemyToQueue(final AllEnemies enemy){
+
+        try {
+            mRealm = Realm.getDefaultInstance();
+            mRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    mRealm.copyToRealmOrUpdate(enemy);
+/*
+                    EnemyQueue queue = mRealm.where(EnemyQueue.class).findFirst();
+                    queue.setEnemyBuffer(enemy);
+*/
+                }
+            });
+        } finally {
+            if(mRealm != null) {
+                mRealm.close();
+            }
+        }
+
+    }
+
+    public RealmList<AllEnemies> getEnemyQueue(){
+
+        RealmList<AllEnemies> enemyList ;
+        try {
+            mRealm = Realm.getDefaultInstance();
+            enemyList = new RealmList<AllEnemies>();
+            enemyList = mRealm.where(EnemyQueue.class).findFirst().getEnemyBuffer();
+/*
+            enemyList = new RealmList<AllEnemies>();
+
+            enemyList.addAll(enemyQueue.subList(0, enemyQueue.size()));
+*/
+
+        } finally {
+            mRealm.close();
+        }
+
+        return enemyList;
 
     }
 
@@ -147,6 +191,24 @@ public class RealmHelper {
         return listOfEnemies;
     }
 
+/*
+    public EnemyQueue getEnemyQueue(){
+        final EnemyQueue[] enemyQueue = new EnemyQueue[1];
+        String position;
+        mRealm = Realm.getDefaultInstance();
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                enemyQueue[0] = realm.where(EnemyQueue.class).findFirst();
+
+            }
+        });
+
+        mRealm.close();
+
+        return enemyQueue[0];
+    }
+*/
 
     public int getPlayerHealth(){
 
@@ -179,6 +241,33 @@ public class RealmHelper {
         }
 
     }
+
+    public void setEnemySelected(final AllEnemies enemy){
+        mRealm = Realm.getDefaultInstance();
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                enemy.setSelected(true);
+                mRealm.copyToRealmOrUpdate(enemy);
+            }
+        });
+        mRealm.close();
+    }
+
+
+    public void setEnemyDeselected(final AllEnemies enemy){
+        mRealm = Realm.getDefaultInstance();
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                enemy.setSelected(false);
+                mRealm.copyToRealmOrUpdate(enemy);
+            }
+        });
+        mRealm.close();
+
+    }
+
 
     public void resetUniverse(){
 
@@ -320,6 +409,25 @@ public class RealmHelper {
             }
         }
     }
+
+    public void dealEnemyDamage(final AllEnemies item, final int damage){
+
+        try {
+            mRealm = Realm.getDefaultInstance();
+            mRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    item.setHealth(item.getHealth() - damage);
+                    realm.insertOrUpdate(item);
+                }
+            });
+        } finally {
+            if(mRealm != null) {
+                mRealm.close();
+            }
+        }
+    }
+
 
     public void delItem(final Item item){
 

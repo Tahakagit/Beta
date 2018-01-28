@@ -1,6 +1,7 @@
 package com.example.franc.misteryapp;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by franc on 27/01/2018.
@@ -8,6 +9,7 @@ import io.realm.RealmObject;
 
 public class AllEnemies extends RealmObject {
 
+    @PrimaryKey
     private String name = null;
     private int health = 20;
     private String location = null;

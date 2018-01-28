@@ -1,6 +1,7 @@
 package com.example.franc.misteryapp;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -67,7 +68,9 @@ public class WorldManagementHelper {
 
         AllEnemies enemy = new AllEnemies();
         enemy.setName("ship - " + randomIdentifier());
-        enemy.setLocation(helper.getRandomLocation());
+        String newLocation = helper.getRandomLocation();
+        enemy.setLocation(newLocation);
+        Toast.makeText(NavigationActivity.context, "New enemy spawned @ " + newLocation, Toast.LENGTH_LONG).show();
         helper.addItem(enemy);
         Log.d("tag", "Spawning new enemy at   " + enemy.getLocation());
 

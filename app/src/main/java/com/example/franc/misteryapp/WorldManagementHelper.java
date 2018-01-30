@@ -71,11 +71,16 @@ public class WorldManagementHelper {
         String newLocation = helper.getRandomLocation();
         enemy.setLocation(newLocation);
         Toast.makeText(NavigationActivity.context, "New enemy spawned @ " + newLocation, Toast.LENGTH_LONG).show();
+        NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
         helper.addItem(enemy);
         Log.d("tag", "Spawning new enemy at   " + enemy.getLocation());
 
 
 
+    }
+    public void deleteEnemy(AllEnemies enemy){
+
+        helper.delItem(enemy);
     }
 
 }

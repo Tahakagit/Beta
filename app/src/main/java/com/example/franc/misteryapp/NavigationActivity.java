@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -45,7 +46,10 @@ public class NavigationActivity extends AppCompatActivity {
     static SpawnEnemyService enemyService;
 
     static Player  player = null;
+/*
     Realm mRealm = null;
+*/
+
 
 
     @Override
@@ -57,7 +61,6 @@ public class NavigationActivity extends AppCompatActivity {
         worldHelper.startUniverse();
 
         context = this;
-        mRealm = Realm.getDefaultInstance();
 
         helper.resetEnemies();
         isPlayer();
@@ -67,7 +70,9 @@ public class NavigationActivity extends AppCompatActivity {
 
 
         listOfLocations = helper.getPlacesAtPLayerPosition();
+/*
         listOfEnemies = mRealm.where(AllEnemies.class).findAll();
+*/
         listOfLocations.addChangeListener(new RealmChangeListener<RealmResults<LocationRealmObject>>() {
             @Override
             public void onChange(RealmResults<LocationRealmObject> locationRealmObjects) {
@@ -123,12 +128,8 @@ public class NavigationActivity extends AppCompatActivity {
 
     // inizializza il Player
     public boolean isPlayer(){
-        //todo ritorna il player
-
-        mRealm = Realm.getDefaultInstance();
-
         try {
-            player = mRealm.where(Player.class).findAllAsync().first();
+            player = helper.getPlayer();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -140,7 +141,6 @@ public class NavigationActivity extends AppCompatActivity {
             helper.resetLocation();
             helper.restoreHealth(player);
         }
-        mRealm.close();
         return true;
     }
 
@@ -182,6 +182,7 @@ public class NavigationActivity extends AppCompatActivity {
         list = (RecyclerView)findViewById(R.id.navigation_rv_enemies);
         list.setLayoutManager(new GridLayoutManager(this, 4));
         list.setAdapter(navigationEnemyAdapter);
+/*
         listOfEnemies.addChangeListener(new RealmChangeListener<RealmResults<AllEnemies>>() {
             @Override
             public void onChange(RealmResults<AllEnemies> allEnemies) {
@@ -189,6 +190,7 @@ public class NavigationActivity extends AppCompatActivity {
                 navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
             }
         });
+*/
 
     }
 
@@ -226,8 +228,24 @@ public class NavigationActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        Toast.makeText(this, "OnResume called on " + this.getLocalClassName(), Toast.LENGTH_LONG);
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Toast.makeText(this, "OnStop called on " + this.getLocalClassName(), Toast.LENGTH_LONG);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+/*
+        mRealm.close();
+*/
 
     }
 }

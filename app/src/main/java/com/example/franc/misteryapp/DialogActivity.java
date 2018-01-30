@@ -54,6 +54,7 @@ public class DialogActivity extends AppCompatActivity implements DialogFragmentG
         starSystem = star;
         helper.setPlayerLocation(starSystem);
         NavigationActivity.navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
+        NavigationActivity.navigationAdapter.UpdateAdapter(helper.getPlacesAtPLayerPosition());
         i = 0;
         finish();
 

@@ -26,6 +26,10 @@ public class EnemyQueue extends RealmObject {
     public void setEnemyBuffer(AllEnemies enemyBuffer) {
         this.enemyBuffer.add(enemyBuffer);
     }
+    public void removeFromEnemyBuffer(AllEnemies enemyBuffer) {
+        this.enemyBuffer.remove(enemyBuffer);
+    }
+
 
     public int getExist() {
         return exist;

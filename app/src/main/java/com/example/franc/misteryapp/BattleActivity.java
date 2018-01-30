@@ -15,6 +15,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.util.ArrayList;
@@ -74,7 +75,9 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
         startNavDrawer();
         //crea Realmobject Player se non esiste e ricarica energia
+/*
         isPlayer();
+*/
 
         startThreads(helper.getEnemyQueue());
         listWeapons = findViewById(R.id.rv_weapons);
@@ -249,21 +252,37 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
             }
         }
 
+
         @Override
         protected Void doInBackground(final AllEnemies... arg0) {
             final Player player;
             final AllEnemies enemies;
 
-            int enemyHealth;
-            player = helper.getPlayer();
-            final Realm backgroundRealm = Realm.getDefaultInstance();
-            //
-            while (helper.getEnemyHealth() > 0) {
-
 /*
-                    Log.i("MainACtivity", arg0[0].getName() + " attacca");
+            final RealmHelper backgroundHelper = new RealmHelper();
 */
+            player = helper.getPlayer();
+            //
+
+            if (arg0[0] == null)
+                cancel(true);
+            while (arg0[0] != null) {
+                if (isCancelled())
+                    break;
+
+
+                while (helper.getEnemyHealth() > 0) {
+                    if (isCancelled())
+                        break;
+
+    /*
+                        Log.i("MainACtivity", arg0[0].getName() + " attacca");
+    */
                     try {
+                        if (isCancelled())
+                            break;
+
+                        Log.d("Asynctask:", "IS ATTACKING");
                         helper.dealDamage(player, 2);
                         int salute = player.getHealth();
                         publishProgress(salute);
@@ -272,42 +291,16 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
                     }
                     Sleep(2000);
 
-            }
-            if (helper.getEnemyHealth() > 0 || helper.getPlayerHealth() > 0){
-
-                if (arg0[0].getHealth() <= 0){
-                    AlertDialog.Builder miaAlert = new AlertDialog.Builder(getParent());
-/*
-                    miaAlert.setTitle("AlertDialog di MrWebMaster");
-*/
-                    miaAlert.setMessage("morto");
-                    AlertDialog alert = miaAlert.create();
-                    alert.show();
-                    miaAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            finish();
-                        }
-                    });
-
-                }else if (helper.getPlayerHealth() <= 0){
-
-                    AlertDialog.Builder miaAlert = new AlertDialog.Builder(getParent());
-/*
-                    miaAlert.setTitle("AlertDialog di MrWebMaster");
-*/
-                    miaAlert.setMessage("morto");
-                    AlertDialog alert = miaAlert.create();
-                    alert.show();
-
-                    miaAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            finish();
-                        }
-                    });
-
                 }
+/*
+                arg0[0].setDead();
+                helper.delEnemy();
+*/
+/*
+                WorldManagementHelper worldHelper = new WorldManagementHelper(helper);
+                worldHelper.deleteEnemy(arg0[0]);
+*/
+                cancel(true);
             }
             return null;
         }
@@ -318,7 +311,10 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
         }
 
-
+        @Override
+        protected void onCancelled() {
+            NavigationActivity.navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
+        }
 
     }
 
@@ -369,19 +365,21 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
             if (selectedEnemies.get(0).getHealth() <= 0){
 
                 // lo rimuovo dalle liste recyclerview e selected
-                mEnemies.remove(selectedEnemies.get(0));
+/*
+                helper.removeEnemyFromQueue(selectedEnemies.get(0));
+*/
+                helper.removeEnemyFromQueue(selectedEnemies.get(0));
+
                 selectedEnemies.remove(selectedEnemies.get(0));
 
-/*
                 enemyAdapter.notifyDataSetChanged();
+                NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
+/*
+                helper.closeSession();
 */
+                finish();
             }
             enemyAdapter.notifyDataSetChanged();
-            // controllare
-
-
-
-
         }
 
 
@@ -414,10 +412,14 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
             currentHolder.reloadTime.setText(R.string.generic_ok);
             // primo nel db diventa primo nella lista e swipable
-            weaponsAdapter.notifyDataSetChanged();
             helper.setFirst();
+            weaponsAdapter.notifyDataSetChanged();
 
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

@@ -79,7 +79,9 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         isPlayer();
 */
 
-        startThreads(helper.getEnemyQueue());
+        RealmList<AllEnemies> enemyqueue = helper.getEnemyQueue();
+        startThreads(enemyqueue);
+
         listWeapons = findViewById(R.id.rv_weapons);
 
         list = (RecyclerView)findViewById(R.id.rv);
@@ -147,14 +149,18 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     public boolean isPlayer(){
         //todo ritorna il player
 
+/*
         mRealm = Realm.getDefaultInstance();
+*/
 
         try {
-            getPlayer = mRealm.where(Player.class).findAllAsync().first();
+            getPlayer = helper.getPlayer();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+/*
+        mRealm.close();
+*/
         if (getPlayer == null){
             Player player = new Player();
             helper.addItem(player);
@@ -162,7 +168,6 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
             helper.resetLocation();
             helper.restoreHealth(getPlayer);
         }
-        mRealm.close();
         return true;
     }
 
@@ -257,11 +262,13 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         protected Void doInBackground(final AllEnemies... arg0) {
             final Player player;
             final AllEnemies enemies;
+            mRealm = Realm.getDefaultInstance();
+            BackgroundRealmHelper bHelper = new BackgroundRealmHelper(mRealm);
 
 /*
             final RealmHelper backgroundHelper = new RealmHelper();
 */
-            player = helper.getPlayer();
+            player = bHelper.getPlayer();
             //
 
             if (arg0[0] == null)
@@ -271,7 +278,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
                     break;
 
 
-                while (helper.getEnemyHealth() > 0) {
+                while (bHelper.getEnemyHealth() > 0) {
                     if (isCancelled())
                         break;
 
@@ -283,7 +290,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
                             break;
 
                         Log.d("Asynctask:", "IS ATTACKING");
-                        helper.dealDamage(player, 2);
+                        bHelper.dealDamage(player, 2);
                         int salute = player.getHealth();
                         publishProgress(salute);
 
@@ -299,6 +306,12 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 /*
                 WorldManagementHelper worldHelper = new WorldManagementHelper(helper);
                 worldHelper.deleteEnemy(arg0[0]);
+*/
+
+                AllEnemies deadEnemy = bHelper.getRealm().where(AllEnemies.class).lessThan("health", 1).findFirst();
+                bHelper.delItem(deadEnemy);
+/*
+                mRealm.close();
 */
                 cancel(true);
             }

@@ -57,8 +57,12 @@ public class NavigationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigation_drawer_exploring);
         helper = new RealmHelper();
+/*
         worldHelper = new WorldManagementHelper(helper);
         worldHelper.startUniverse();
+*/
+
+        Realm mRealm = Realm.getDefaultInstance();
 
         context = this;
 
@@ -85,6 +89,7 @@ public class NavigationActivity extends AppCompatActivity {
         startFab();
         startNavDrawer();
 
+        mRealm.close();
     }
 
     @Override
@@ -128,6 +133,7 @@ public class NavigationActivity extends AppCompatActivity {
 
     // inizializza il Player
     public boolean isPlayer(){
+        Realm mRealm = Realm.getDefaultInstance();
         try {
             player = helper.getPlayer();
         } catch (Exception e) {
@@ -141,6 +147,7 @@ public class NavigationActivity extends AppCompatActivity {
             helper.resetLocation();
             helper.restoreHealth(player);
         }
+        mRealm.close();
         return true;
     }
 
@@ -177,7 +184,10 @@ public class NavigationActivity extends AppCompatActivity {
     }
 
     public void startEnemiesRecyclerView(){
-        navigationEnemyAdapter = new MyNavigationEnemyAdapter(helper.getEnemiesAtPLayerPosition());
+        Realm mRealm = Realm.getDefaultInstance();
+
+        RealmResults<AllEnemies> allEnemiesAtPlayerPosition = helper.getEnemiesAtPLayerPosition();
+        navigationEnemyAdapter = new MyNavigationEnemyAdapter(allEnemiesAtPlayerPosition);
         RecyclerView list;
         list = (RecyclerView)findViewById(R.id.navigation_rv_enemies);
         list.setLayoutManager(new GridLayoutManager(this, 4));
@@ -191,7 +201,6 @@ public class NavigationActivity extends AppCompatActivity {
             }
         });
 */
-
     }
 
     public void startFab(){

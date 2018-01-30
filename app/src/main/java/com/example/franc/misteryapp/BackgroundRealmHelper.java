@@ -14,18 +14,21 @@ import io.realm.RealmResults;
  * Created by franc on 09/01/2018.
  */
 
-public class RealmHelper {
+public class BackgroundRealmHelper {
 
     private Realm mRealm;
 
-    public RealmHelper() {
+    public BackgroundRealmHelper(Realm realm) {
+        this.mRealm = realm;
     }
 
+    public Realm getRealm(){
+        return this.mRealm;
+    }
     public Player getPlayer(){
 
         final Player[] player = new Player[1];
 
-        mRealm = Realm.getDefaultInstance();
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -35,17 +38,14 @@ public class RealmHelper {
             }
         });
 
-        mRealm.close();
         return player[0];
 
     }
     public int getPlayerHealth(){
 
         int health;
-        mRealm = Realm.getDefaultInstance();
         Player getPlayer = mRealm.where(Player.class).findAll().first();
         health = getPlayer.getHealth();
-        mRealm.close();
         return health;
 
     }
@@ -53,17 +53,14 @@ public class RealmHelper {
 
         String position;
         try {
-            mRealm = Realm.getDefaultInstance();
             Player getPlayer = mRealm.where(Player.class).findAll().first();
             position = getPlayer.getLocation();
         } finally {
-            mRealm.close();
         }
         return position;
     }
     public void setPlayerLocation(final String firstStar){
 
-        mRealm = Realm.getDefaultInstance();
         final Player player = mRealm.where(Player.class).findAll().first();
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -72,12 +69,10 @@ public class RealmHelper {
 
             }
         });
-        mRealm.close();
 
     }
     public void resetLocation(){
         String position;
-        mRealm = Realm.getDefaultInstance();
         final Player getPlayer = mRealm.where(Player.class).findAll().first();
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -87,13 +82,11 @@ public class RealmHelper {
             }
         });
 
-        mRealm.close();
 
     }
 
     public void resetEnemies(){
         String position;
-        mRealm = Realm.getDefaultInstance();
         final RealmResults<AllEnemies> getEnemies = mRealm.where(AllEnemies.class).findAll();
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -102,11 +95,9 @@ public class RealmHelper {
             }
         });
 
-        mRealm.close();
 
     }
     public void setEnemySelected(final AllEnemies enemy){
-        mRealm = Realm.getDefaultInstance();
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -114,12 +105,10 @@ public class RealmHelper {
                 enemy.setSelected(true);
             }
         });
-        mRealm.close();
 
 
     }
     public void setEnemyUnselected(final AllEnemies enemy){
-        mRealm = Realm.getDefaultInstance();
         final Player player = mRealm.where(Player.class).findAll().first();
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -128,7 +117,6 @@ public class RealmHelper {
                 enemy.setSelected(false);
             }
         });
-        mRealm.close();
 
 
     }
@@ -136,21 +124,18 @@ public class RealmHelper {
     public int getEnemyHealth(){
         final int health ;
         try {
-            mRealm = Realm.getDefaultInstance();
             RealmList<AllEnemies> enemy = mRealm.where(EnemyQueue.class).findFirst().getEnemyBuffer();
             if (enemy.size() != 0)
                 health = enemy.get(0).getHealth();
             else
                 return 0;
         } finally {
-            mRealm.close();
         }
         return health;
     }
     public void addEnemyToQueue(final AllEnemies enemy){
 
         try {
-            mRealm = Realm.getDefaultInstance();
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -162,9 +147,6 @@ public class RealmHelper {
                 }
             });
         } finally {
-            if(mRealm != null) {
-                mRealm.close();
-            }
         }
 
     }
@@ -172,11 +154,9 @@ public class RealmHelper {
 
         RealmList<AllEnemies> enemyList ;
         try {
-            mRealm = Realm.getDefaultInstance();
             enemyList = new RealmList<AllEnemies>();
             enemyList = mRealm.where(EnemyQueue.class).findFirst().getEnemyBuffer();
         } finally {
-            mRealm.close();
         }
 
         return enemyList;
@@ -185,17 +165,15 @@ public class RealmHelper {
     public void removeEnemyFromQueue(final AllEnemies enemy){
 
         try {
-            mRealm = Realm.getDefaultInstance();
-        mRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                EnemyQueue enemyList = mRealm.where(EnemyQueue.class).findFirst();
-                enemyList.removeFromEnemyBuffer(enemy);
-            }
-        });
+            mRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    EnemyQueue enemyList = mRealm.where(EnemyQueue.class).findFirst();
+                    enemyList.removeFromEnemyBuffer(enemy);
+                }
+            });
 
         } finally {
-            mRealm.close();
         }
 
     }
@@ -204,10 +182,8 @@ public class RealmHelper {
 
         RealmResults<AllEnemies> listOfEnemies;
         try {
-            mRealm = Realm.getDefaultInstance();
             listOfEnemies = mRealm.where(AllEnemies.class).equalTo("location", getPlayerLocation()).findAll();
         } finally {
-            mRealm.close();
         }
 
 
@@ -218,7 +194,6 @@ public class RealmHelper {
     public void resetUniverse(){
 
         try {
-            mRealm = Realm.getDefaultInstance();
 
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
@@ -230,7 +205,6 @@ public class RealmHelper {
             });
 
         } finally {
-            mRealm.close();
         }
 
     }
@@ -239,7 +213,6 @@ public class RealmHelper {
 
         String randomStarSystem;
         try {
-            mRealm = Realm.getDefaultInstance();
             int getSize = mRealm.where(LocationRealmObject.class).findAll().size();
             int Low = 10;
             int High = getSize;
@@ -249,7 +222,6 @@ public class RealmHelper {
             RealmResults<LocationRealmObject> location = mRealm.where(LocationRealmObject.class).equalTo("locationId", Result).findAll();
             randomStarSystem = location.get(0).getLocationStar();
         } finally {
-            mRealm.close();
 
         }
         return randomStarSystem;
@@ -259,10 +231,8 @@ public class RealmHelper {
 
         RealmResults<LocationRealmObject> listOfPlaces;
         try {
-            mRealm = Realm.getDefaultInstance();
             listOfPlaces = mRealm.where(LocationRealmObject.class).equalTo("locationStar", getPlayerLocation()).findAll();
         } finally {
-            mRealm.close();
         }
 
         return listOfPlaces;
@@ -273,7 +243,6 @@ public class RealmHelper {
     public void resetWeapons(){
 
         try {
-            mRealm = Realm.getDefaultInstance();
 
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
@@ -285,7 +254,6 @@ public class RealmHelper {
             });
 
         } finally {
-            mRealm.close();
 
         }
 
@@ -294,10 +262,8 @@ public class RealmHelper {
 
         RealmResults<WeaponSet> listOfWeapons;
         try {
-            mRealm = Realm.getDefaultInstance();
             listOfWeapons = mRealm.where(WeaponSet.class).findAll();
         } finally {
-            mRealm.close();
         }
 
         return listOfWeapons;
@@ -306,7 +272,6 @@ public class RealmHelper {
     public int removeWeaponAt(final int index){
 
         final int[] weaponPower = new int[1];
-        mRealm = Realm.getDefaultInstance();
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -318,7 +283,6 @@ public class RealmHelper {
             }
         });
         if(mRealm != null) {
-            mRealm.close();
         }
 
         return weaponPower[0];
@@ -326,7 +290,6 @@ public class RealmHelper {
     public void addWeapon(final RealmObject item){
 
         try {
-            mRealm = Realm.getDefaultInstance();
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -334,9 +297,6 @@ public class RealmHelper {
                 }
             });
         } finally {
-            if(mRealm != null) {
-                mRealm.close();
-            }
         }
     }
 
@@ -345,10 +305,8 @@ public class RealmHelper {
 
         RealmResults<AllEnemies> listOfDeadEnemies;
         try {
-            mRealm = Realm.getDefaultInstance();
             listOfDeadEnemies = mRealm.where(AllEnemies.class).lessThan("health", 1).findAll();
         } finally {
-            mRealm.close();
         }
 
         return listOfDeadEnemies;
@@ -359,7 +317,6 @@ public class RealmHelper {
     public void addItem(final RealmObject item){
 
         try {
-            mRealm = Realm.getDefaultInstance();
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -367,31 +324,29 @@ public class RealmHelper {
                 }
             });
         } finally {
-            if(mRealm != null) {
-                mRealm.close();
-            }
         }
     }
 
 
     public void restoreHealth(final Player item){
 
-            final Player dsds = item;
+        try {
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    dsds.setHealth(100);
-/*
+                    item.setHealth(100);
                     realm.insertOrUpdate(item);
-*/
                 }
             });
+        } finally {
+            if(mRealm != null) {
+            }
+        }
     }
 
     public void setFirst(){
 
         try {
-            mRealm = Realm.getDefaultInstance();
             mRealm.executeTransaction(new Realm.Transaction() {
                 WeaponSet realFirst = mRealm.where(WeaponSet.class).findFirst();
 
@@ -403,14 +358,12 @@ public class RealmHelper {
             });
         } finally {
             if(mRealm != null) {
-                mRealm.close();
             }
         }
     }
 
     public void dealDamage(final Player item, final int damage){
 
-        mRealm = Realm.getDefaultInstance();
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -418,14 +371,10 @@ public class RealmHelper {
                 realm.insertOrUpdate(item);
             }
         });
-        if(mRealm != null) {
-            mRealm.close();
-        }
     }
 
     public void dealEnemyDamage(final AllEnemies item, final int damage){
 
-        mRealm = Realm.getDefaultInstance();
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -433,21 +382,12 @@ public class RealmHelper {
                 realm.insertOrUpdate(item);
             }
         });
-        if(mRealm != null) {
-            mRealm.close();
-        }
     }
 
 
-/*
-    public void closeSession(){
-        mRealm.close();
-    }
-*/
     public void delItem(final AllEnemies item){
 
         try {
-            mRealm = Realm.getDefaultInstance();
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -456,37 +396,28 @@ public class RealmHelper {
                 }
             });
         } finally {
-            if(mRealm != null) {
-                mRealm.close();
-            }
         }
     }
 
 
     public void delEnemy(){
 
-            mRealm = Realm.getDefaultInstance();
-            mRealm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    AllEnemies item = mRealm.where(AllEnemies.class).equalTo("isDead", true).findFirst();
-                    item.deleteFromRealm();
-                }
-            });
-            if(mRealm != null) {
-                mRealm.close();
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                AllEnemies item = mRealm.where(AllEnemies.class).equalTo("isDead", true).findFirst();
+                item.deleteFromRealm();
             }
+        });
     }
 
     public RealmResults retrieveAllItem(){
 
         RealmResults result = null;
         try {
-            mRealm = Realm.getDefaultInstance();
             result = mRealm.where(Item.class).findAllAsync();
         } finally {
             if(mRealm != null) {
-                mRealm.close();
             }
         }
         return result;
@@ -494,10 +425,8 @@ public class RealmHelper {
 
     public String getFirstStar(){
 
-        mRealm = Realm.getDefaultInstance();
 
         String firstStar= mRealm.where(LocationRealmObject.class).findFirst().getLocationStar();
-        mRealm.close();
 
         return firstStar;
 

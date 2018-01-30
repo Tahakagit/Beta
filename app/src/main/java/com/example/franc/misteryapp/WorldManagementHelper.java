@@ -14,9 +14,9 @@ import io.realm.Realm;
 
 public class WorldManagementHelper {
     private Realm mRealm;
-    private RealmHelper helper;
+    private BackgroundRealmHelper helper;
 
-    public WorldManagementHelper(RealmHelper helper) {
+    public WorldManagementHelper(BackgroundRealmHelper helper) {
         this.helper = helper;
     }
 
@@ -66,6 +66,7 @@ public class WorldManagementHelper {
 
     public void spawnEnemy(){
 
+        mRealm = helper.getRealm();
         AllEnemies enemy = new AllEnemies();
         enemy.setName("ship - " + randomIdentifier());
         String newLocation = helper.getRandomLocation();
@@ -76,7 +77,7 @@ public class WorldManagementHelper {
         Log.d("tag", "Spawning new enemy at   " + enemy.getLocation());
 
 
-
+        mRealm.close();
     }
     public void deleteEnemy(AllEnemies enemy){
 

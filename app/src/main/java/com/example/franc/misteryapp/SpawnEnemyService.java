@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 
+import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**
@@ -49,17 +50,20 @@ public class SpawnEnemyService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Realm mrealm = Realm.getDefaultInstance();
 
-        RealmHelper helper = new RealmHelper();
+        BackgroundRealmHelper helper = new BackgroundRealmHelper(mrealm);
         WorldManagementHelper worldHelper = new WorldManagementHelper(helper);
         worldHelper.spawnEnemy();
 
         // get allenemies morti e li rimuove
 
+/*
         RealmResults<AllEnemies> enemylist = helper.getDeadEnemies();
         for (AllEnemies res: enemylist) {
             helper.delItem(res);
         }
+*/
 
         // far agire tutti i nemici esistenti
         // plan()

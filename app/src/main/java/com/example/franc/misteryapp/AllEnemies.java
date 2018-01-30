@@ -15,6 +15,7 @@ public class AllEnemies extends RealmObject {
     private String location = null;
     private boolean isSelected = false;
     private boolean isDead = false;
+    private String id = null;
 
     public int getHealth() {
         return health;
@@ -58,5 +59,13 @@ public class AllEnemies extends RealmObject {
 
     public void setDead() {
         isDead = true;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

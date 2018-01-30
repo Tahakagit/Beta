@@ -174,7 +174,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     // riceve enemies e per ognuno avvia un thread
     public void startThreads(RealmList<AllEnemies> enemies){
         for (AllEnemies res:enemies) {
-            new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, res);
+            new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, res.getId());
 
         }
     }
@@ -246,7 +246,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
 
     // thread per il comportamento del nemico
-    private class BackgroundTask extends AsyncTask<AllEnemies, Integer, Void>{
+    private class BackgroundTask extends AsyncTask<String, Integer, Void>{
 
 
         void Sleep(int ms){
@@ -259,11 +259,12 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
 
         @Override
-        protected Void doInBackground(final AllEnemies... arg0) {
+        protected Void doInBackground(final String... arg0) {
             final Player player;
             final AllEnemies enemies;
             mRealm = Realm.getDefaultInstance();
             BackgroundRealmHelper bHelper = new BackgroundRealmHelper(mRealm);
+            AllEnemies enemy = bHelper.getRealm().where(AllEnemies.class).equalTo("id", arg0[0]).findFirst();
 
 /*
             final RealmHelper backgroundHelper = new RealmHelper();
@@ -289,6 +290,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
                         if (isCancelled())
                             break;
 
+                        Sleep(2000);
                         Log.d("Asynctask:", "IS ATTACKING");
                         bHelper.dealDamage(player, 2);
                         int salute = player.getHealth();
@@ -296,7 +298,6 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
                     } finally {
                     }
-                    Sleep(2000);
 
                 }
 /*
@@ -308,8 +309,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
                 worldHelper.deleteEnemy(arg0[0]);
 */
 
-                AllEnemies deadEnemy = bHelper.getRealm().where(AllEnemies.class).lessThan("health", 1).findFirst();
-                bHelper.delItem(deadEnemy);
+                bHelper.delItem(enemy);
 /*
                 mRealm.close();
 */

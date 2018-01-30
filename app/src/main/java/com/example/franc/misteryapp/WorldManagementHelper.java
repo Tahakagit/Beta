@@ -71,6 +71,7 @@ public class WorldManagementHelper {
         enemy.setName("ship - " + randomIdentifier());
         String newLocation = helper.getRandomLocation();
         enemy.setLocation(newLocation);
+        enemy.setId(randomIdentifier());
         Toast.makeText(NavigationActivity.context, "New enemy spawned @ " + newLocation, Toast.LENGTH_LONG).show();
         NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
         helper.addItem(enemy);

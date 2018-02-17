@@ -4,7 +4,7 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * Created by franc on 27/01/2018.
+ * Enemy RealmObject
  */
 
 public class AllEnemies extends RealmObject {

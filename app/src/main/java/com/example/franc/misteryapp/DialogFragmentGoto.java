@@ -39,14 +39,8 @@ public class DialogFragmentGoto extends Fragment {
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         return inflater.inflate(R.layout.fragment_dialog_goto, container, false);
-
-
     }
-
-
-
 
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         final Button next = view.findViewById(R.id.next);
@@ -60,14 +54,22 @@ public class DialogFragmentGoto extends Fragment {
             }
         } );
     }
+
+    /**
+     * INTERFACE TO SEND SELECTED STARSYSTEM TO NAVIGATIONACTIVITY
+     */
     public interface SendToDialogActivity{
         public void navigateTo(String starSystem);
     }
 
-
-    // start spinner and return selected starsystem
+    /**
+     * GETS LIST OF STARSYSTEMS AND RETURNS THE SELECTED ONES
+     * TODO MUST GET LIST FROM DB VIA REALMHELPER
+     * @param starSystems LIST OF STARSYSTEMS
+     * @param view VIEW RETURNED FROM ONCREATEVIEW WITH SPINNER
+     * @return
+     */
     public String getStarFromSpinner(List<String> starSystems, View view){
-        // passa una lista di tutti gli starsystem
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, starSystems);
         spinner = view.findViewById(R.id.location_spinner);
         spinner.setAdapter(dataAdapter);

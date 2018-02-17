@@ -1,7 +1,5 @@
 package com.example.franc.misteryapp;
 
-import java.security.Timestamp;
-
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 

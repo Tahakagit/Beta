@@ -1,7 +1,5 @@
 package com.example.franc.misteryapp;
 
-import android.provider.Settings;
-
 import io.realm.RealmObject;
 
 /**

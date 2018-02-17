@@ -1,7 +1,5 @@
 package com.example.franc.misteryapp;
 
-import java.util.Calendar;
-
 import io.realm.annotations.PrimaryKey;
 
 /**

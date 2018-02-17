@@ -28,8 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import io.realm.RealmList;
 
 public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHolder> {
@@ -88,27 +86,21 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mCardView.setText(mDataset.get(position).getName());
         holder.enemyHealth.setText(String.valueOf(mDataset.get(position).getHealth()));
-        //todo creare campo energia
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if (holder.isSelected != true){
+                if (!holder.isSelected){
                     holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.cardview_light_background));
                     holder.isSelected = true;
-                    iface2.onItemDeselected(mDataset.get(position));
+                    iface2.onItemDeselected(mDataset.get(holder.getAdapterPosition()));
                 }else {
                     holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.colorAccent));
                     holder.isSelected = false;
-                    iface.onItemSelected(mDataset.get(position));
-/*
-                    holder.isSelected = false;
-*/
+                    iface.onItemSelected(mDataset.get(holder.getAdapterPosition()));
                 }
             }
 

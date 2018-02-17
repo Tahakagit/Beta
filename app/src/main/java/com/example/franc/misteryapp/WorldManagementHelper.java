@@ -14,9 +14,9 @@ import io.realm.Realm;
 
 public class WorldManagementHelper {
     private Realm mRealm;
-    private BackgroundRealmHelper helper;
+    private RealmHelper helper;
 
-    public WorldManagementHelper(BackgroundRealmHelper helper) {
+    public WorldManagementHelper(RealmHelper helper) {
         this.helper = helper;
     }
 
@@ -72,13 +72,19 @@ public class WorldManagementHelper {
         String newLocation = helper.getRandomLocation();
         enemy.setLocation(newLocation);
         enemy.setId(randomIdentifier());
+/*
         Toast.makeText(NavigationActivity.context, "New enemy spawned @ " + newLocation, Toast.LENGTH_LONG).show();
+*/
+/*
         NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
+*/
         helper.addItem(enemy);
         Log.d("tag", "Spawning new enemy at   " + enemy.getLocation());
 
 
+/*
         mRealm.close();
+*/
     }
     public void deleteEnemy(AllEnemies enemy){
 

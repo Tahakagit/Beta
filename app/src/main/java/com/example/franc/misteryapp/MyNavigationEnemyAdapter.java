@@ -11,9 +11,6 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**
@@ -75,7 +72,7 @@ public class MyNavigationEnemyAdapter extends RecyclerView.Adapter<MyNavigationE
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.mCardView.setText(mDataset.get(position).getName());
@@ -100,7 +97,7 @@ public class MyNavigationEnemyAdapter extends RecyclerView.Adapter<MyNavigationE
                                 EnemyQueue queue = new EnemyQueue();
                                 RealmHelper helper = new RealmHelper();
                                 queue.setExist(1);
-                                queue.setEnemyBuffer(mDataset.get(position));
+                                queue.setEnemyBuffer(mDataset.get(holder.getAdapterPosition()));
                                 helper.addItem(queue);
                                 NavigationActivity.context.startActivity(attackEnemy);
 

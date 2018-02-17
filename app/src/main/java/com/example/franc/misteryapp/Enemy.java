@@ -1,7 +1,5 @@
 package com.example.franc.misteryapp;
 
-import android.os.Handler;
-
 /**
  * Created by franc on 14/01/2018.
  */

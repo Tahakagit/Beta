@@ -1,30 +1,21 @@
 package com.example.franc.misteryapp;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
-
 public class DialogActivity extends AppCompatActivity implements DialogFragmentGoto.SendToDialogActivity {
 
-    static int i = 0;
     final FragmentManager fragmentManager = getSupportFragmentManager();
     final ArrayList<Fragment> fragments = new ArrayList <>();
 
     static Button next;
     static String starSystem = null;
-
-    RealmHelper helper;
 
 
     @Override
@@ -33,30 +24,35 @@ public class DialogActivity extends AppCompatActivity implements DialogFragmentG
         setContentView(R.layout.activity_dialog);
         next = findViewById(R.id.next);
 
-        helper = new RealmHelper();
-
-
-        final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-
         fragments.add(new DialogFragmentGoto());
-
-        fragmentTransaction.add(R.id.fragmentcontainer, fragments.get(i));
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
-
-
+        startFragmentsInActivityDialog(fragments);
     }
 
-    @Override
+    /**
+     * Starts a fragments sequence in dialogactivity
+     *
+     * @param fragmentsArrayList arraylist filled with fragments to show
+     */
+    public void startFragmentsInActivityDialog(ArrayList<Fragment> fragmentsArrayList){
+        int i = 0;
+        final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        for (Fragment frag:fragmentsArrayList) {
+            fragmentTransaction.add(R.id.fragmentcontainer, frag);
+        }
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    /**
+     * SET PLAYER NEW LOCATION AND UPDATES UI
+     * IFACE CALLED FROM DIALOGFRAMENTGOTO
+     * @param star String new location to navigate to
+     */
     public void navigateTo(String star) {
-        starSystem = star;
-        helper.setPlayerLocation(starSystem);
+        RealmHelper helper = new RealmHelper();
+        helper.setPlayerLocation(star);
         NavigationActivity.navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
         NavigationActivity.navigationAdapter.UpdateAdapter(helper.getPlacesAtPLayerPosition());
-        i = 0;
         finish();
-
     }
 }

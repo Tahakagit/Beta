@@ -1,8 +1,6 @@
 package com.example.franc.misteryapp;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
@@ -15,9 +13,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.nio.file.attribute.BasicFileAttributeView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -246,8 +242,19 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
 
     // thread per il comportamento del nemico
+
+    /**
+     * Enemy behaviour thread
+     * Must reference db items from scratch
+     * Todo remove BackgroundRealmHelper usage
+     *
+     */
     private class BackgroundTask extends AsyncTask<String, Integer, Void>{
 
+        /**
+         *
+         * @param ms Time to sleep
+         */
 
         void Sleep(int ms){
             try{
@@ -257,15 +264,23 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
             }
         }
 
-
+        /**
+         *
+         *
+         * @param arg0  enemy's id
+         * @return nothing
+         */
         @Override
         protected Void doInBackground(final String... arg0) {
             final Player player;
             final AllEnemies enemies;
-            mRealm = Realm.getDefaultInstance();
-            BackgroundRealmHelper bHelper = new BackgroundRealmHelper(mRealm);
-            AllEnemies enemy = bHelper.getRealm().where(AllEnemies.class).equalTo("id", arg0[0]).findFirst();
 
+            // todo remove this realm instance?
+            mRealm = Realm.getDefaultInstance();
+            RealmHelper bHelper = new RealmHelper();
+            Realm realm = helper.getRealm();
+            AllEnemies enemy = realm.where(AllEnemies.class).equalTo("id", arg0[0]).findFirst();
+            realm.close();
 /*
             final RealmHelper backgroundHelper = new RealmHelper();
 */
@@ -300,19 +315,8 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
                     }
 
                 }
-/*
-                arg0[0].setDead();
-                helper.delEnemy();
-*/
-/*
-                WorldManagementHelper worldHelper = new WorldManagementHelper(helper);
-                worldHelper.deleteEnemy(arg0[0]);
-*/
 
                 bHelper.delItem(enemy);
-/*
-                mRealm.close();
-*/
                 cancel(true);
             }
             return null;
@@ -366,30 +370,12 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
             // rimuove on swipe il proiettile e ne ritorna in danno
             int power = weaponsAdapter.deleteItemAt(position);
-
-            // danneggia il selezionato
-/*
-            selectedEnemies.get(0).getDamage(power);
-*/
-
             helper.dealEnemyDamage(selectedEnemies.get(0), power);
-
-            // se il nemico è morto
             if (selectedEnemies.get(0).getHealth() <= 0){
-
-                // lo rimuovo dalle liste recyclerview e selected
-/*
                 helper.removeEnemyFromQueue(selectedEnemies.get(0));
-*/
-                helper.removeEnemyFromQueue(selectedEnemies.get(0));
-
                 selectedEnemies.remove(selectedEnemies.get(0));
-
                 enemyAdapter.notifyDataSetChanged();
                 NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
-/*
-                helper.closeSession();
-*/
                 finish();
             }
             enemyAdapter.notifyDataSetChanged();

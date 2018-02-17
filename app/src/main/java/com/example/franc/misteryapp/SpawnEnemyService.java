@@ -1,13 +1,14 @@
 package com.example.franc.misteryapp;
 
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 /**
  * Created by franc on 27/01/2018.
@@ -16,6 +17,7 @@ import io.realm.RealmResults;
 public class SpawnEnemyService extends IntentService {
     Handler handler = new Handler();
     static final int SERVICE_ID = 622;
+
 
 
     /**
@@ -33,29 +35,13 @@ public class SpawnEnemyService extends IntentService {
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-/*
-        // Normally we would do some work here, like download a file.
-        // For our sample, we just sleep for 5 seconds.
-        try {
-            RealmHelper helper = new RealmHelper();
-            WorldManagementHelper worldHelper = new WorldManagementHelper(helper);
-            worldHelper.spawnEnemy();
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // Restore interrupt status.
-            Thread.currentThread().interrupt();
-        }
-*/
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
         Realm mrealm = Realm.getDefaultInstance();
 
-        BackgroundRealmHelper helper = new BackgroundRealmHelper(mrealm);
+        RealmHelper helper = new RealmHelper();
         WorldManagementHelper worldHelper = new WorldManagementHelper(helper);
         worldHelper.spawnEnemy();
 
+        mrealm.close();
         // get allenemies morti e li rimuove
 
 /*
@@ -69,14 +55,22 @@ public class SpawnEnemyService extends IntentService {
         // plan()
         // do()
 
-        // If we get killed, after returning from here, restart
-        return START_NOT_STICKY;
+        // If we get killed, afSter returning from here, restart
     }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+
+
+    }
+
 
     public void enemyRoutine(){
         // query tutti i nemici
         // foreach
     }
+
 
     @Override
     public Context getBaseContext() {

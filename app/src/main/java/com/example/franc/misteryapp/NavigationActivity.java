@@ -42,15 +42,11 @@ public class NavigationActivity extends AppCompatActivity {
     static MyNavigationEnemyAdapter navigationEnemyAdapter;
     static WorldManagementHelper worldHelper;
     static RealmResults<LocationRealmObject> listOfLocations;
-    static RealmResults<AllEnemies> listOfEnemies;
     static Context context;
 
     static SpawnEnemyService enemyService;
 
     static Player  player = null;
-/*
-    Realm mRealm = null;
-*/
 
 
 
@@ -64,25 +60,19 @@ public class NavigationActivity extends AppCompatActivity {
         Realm mRealm = Realm.getDefaultInstance();
 
         context = this;
-
-        helper.resetEnemies();
         isPlayer();
-        playerLocation = helper.getPlayerLocation();
-        if (playerLocation == null)
-            helper.setPlayerLocation(helper.getFirstStar());
 
 
         listOfLocations = helper.getPlacesAtPLayerPosition();
-/*
-        listOfEnemies = mRealm.where(AllEnemies.class).findAll();
-*/
         listOfLocations.addChangeListener(new RealmChangeListener<RealmResults<LocationRealmObject>>() {
             @Override
             public void onChange(RealmResults<LocationRealmObject> locationRealmObjects) {
                 navigationAdapter.notifyDataSetChanged();
             }
         });
+/*
         startEnemyLifeService();
+*/
         startLocationsRecyclerView();
         startEnemiesRecyclerView();
         startFab();
@@ -117,7 +107,7 @@ public class NavigationActivity extends AppCompatActivity {
 
     }
 
-    // genera stringhe casuali
+    // GENERA STRINGHE CASUALI
     public String randomIdentifier() {
         final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
         final java.util.Random rand = new java.util.Random();
@@ -134,12 +124,6 @@ public class NavigationActivity extends AppCompatActivity {
             }
         }
         return builder.toString();
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     //NAVIGATION DRAWER
@@ -176,41 +160,46 @@ public class NavigationActivity extends AppCompatActivity {
 
     }
 
-    // inizializza il Player
+    // PLAYER INIT
     public boolean isPlayer(){
-        Realm mRealm = Realm.getDefaultInstance();
-        try {
-            player = helper.getPlayer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (player == null){
+        /**
+         * Check if player already exists if not create it and set
+         * location
+         *
+         * todo set start point if !player
+         */
+        if (helper.getPlayer() == null){
             Player player = new Player();
             helper.addItem(player);
         }else {
             helper.resetLocation();
-            helper.restoreHealth(player);
+            helper.restoreHealth(helper.getPlayer());
         }
-        mRealm.close();
+        playerLocation = helper.getPlayerLocation();
+        if (playerLocation == null)
+            helper.setPlayerLocation(helper.getFirstStar());
+
         return true;
     }
 
+    /**
+     * START ENEMY SPAWN SERVICE
+     */
     public void startEnemyLifeService(){
         Context ctx = getApplicationContext();
-/** this gives us the time for the first trigger.  */
         Calendar cal = Calendar.getInstance();
         AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
-        long interval = 2000; // 5 minutes in milliseconds
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.add(Calendar.SECOND, 2); // first time
+
+        long interval = 2 * 1000; // 5 minutes in milliseconds
         Intent serviceIntent = new Intent(ctx, SpawnEnemyService.class);
-// make sure you **don't** use *PendingIntent.getBroadcast*, it wouldn't work
         PendingIntent servicePendingIntent =
                 PendingIntent.getService(ctx,
                         SpawnEnemyService.SERVICE_ID, // integer constant used to identify the service
                         serviceIntent,
                         PendingIntent.FLAG_CANCEL_CURRENT);  // FLAG to avoid creating a second service if there's already one running
-// there are other options like setInexactRepeating, check the docs
-        am.setRepeating(
+        am.setInexactRepeating(
                 AlarmManager.RTC_WAKEUP,//type of alarm. This one will wake up the device when it goes off, but there are others, check the docs
                 cal.getTimeInMillis(),
                 interval,
@@ -219,6 +208,7 @@ public class NavigationActivity extends AppCompatActivity {
 
     }
 
+    // START LOCATIONS RECYCLERVIEW
     public void startLocationsRecyclerView(){
         navigationAdapter = new MyNavigationAdapter(listOfLocations);
         RecyclerView list;
@@ -228,26 +218,16 @@ public class NavigationActivity extends AppCompatActivity {
 
     }
 
+    // START ENEMIES RECYCLERVIEW
     public void startEnemiesRecyclerView(){
-        Realm mRealm = Realm.getDefaultInstance();
-
-        RealmResults<AllEnemies> allEnemiesAtPlayerPosition = helper.getEnemiesAtPLayerPosition();
-        navigationEnemyAdapter = new MyNavigationEnemyAdapter(allEnemiesAtPlayerPosition);
+        navigationEnemyAdapter = new MyNavigationEnemyAdapter(helper.getEnemiesAtPLayerPosition());
         RecyclerView list;
         list = (RecyclerView)findViewById(R.id.navigation_rv_enemies);
         list.setLayoutManager(new GridLayoutManager(this, 4));
         list.setAdapter(navigationEnemyAdapter);
-/*
-        listOfEnemies.addChangeListener(new RealmChangeListener<RealmResults<AllEnemies>>() {
-            @Override
-            public void onChange(RealmResults<AllEnemies> allEnemies) {
-
-                navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
-            }
-        });
-*/
     }
 
+    // START FLOATING MENU
     public void startFab(){
         FloatingActionButton fab = findViewById(R.id.fab);
 
@@ -278,13 +258,6 @@ public class NavigationActivity extends AppCompatActivity {
 
             }
         });
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Toast.makeText(this, "OnResume called on " + this.getLocalClassName(), Toast.LENGTH_LONG);
 
     }
 

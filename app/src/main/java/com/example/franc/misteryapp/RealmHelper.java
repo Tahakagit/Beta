@@ -28,10 +28,22 @@ public class RealmHelper {
     }
 
 
-    // GET PLAYER
+    // GET PLAYER OR CREATES IT IF NOT EXISTS
     Player getPlayer(){
         mRealm = Realm.getDefaultInstance();
-        Player player = mRealm.where(Player.class).findAll().first();
+        Player player = null;
+
+
+        try {
+            player = mRealm.where(Player.class).findAll().first();
+        } catch (IndexOutOfBoundsException e) {
+
+            mRealm.beginTransaction();
+            player = new Player();
+            player.setLocation(getRandomLocation());
+            mRealm.copyToRealm(player);
+            mRealm.commitTransaction();
+        }
         mRealm.close();
         return player;
     }
@@ -47,7 +59,12 @@ public class RealmHelper {
     // GET PLAYER LOCATION
     String getPlayerLocation(){
         mRealm = Realm.getDefaultInstance();
-        String playerLocation = mRealm.where(Player.class).findAll().first().getLocation();
+        String playerLocation = null;
+        try {
+            playerLocation = getPlayer().getLocation();
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+        }
         mRealm.close();
         return playerLocation;
     }
@@ -70,7 +87,8 @@ public class RealmHelper {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(@Nonnull Realm realm) {
-                getPlayer().setLocation(null);
+                Player player = getPlayer();
+                player.setLocation(getRandomLocation());
             }
         });
     }
@@ -296,13 +314,15 @@ public class RealmHelper {
     }
 
 
-    void restoreHealth(final Player item){
+    void restorePlayerHealth(){
 
-            final Player dsds = item;
+            mRealm = Realm.getDefaultInstance();
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(@Nonnull Realm realm) {
-                    dsds.setHealth(100);
+                    Player player = realm.where(Player.class).findFirst();
+
+                    player.setHealth(100);
 /*
                     realm.insertOrUpdate(item);
 */

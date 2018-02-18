@@ -141,32 +141,6 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
     }
 
-    // inizializza il Player
-    public boolean isPlayer(){
-        //todo ritorna il player
-
-/*
-        mRealm = Realm.getDefaultInstance();
-*/
-
-        try {
-            getPlayer = helper.getPlayer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-/*
-        mRealm.close();
-*/
-        if (getPlayer == null){
-            Player player = new Player();
-            helper.addItem(player);
-        }else {
-            helper.resetLocation();
-            helper.restoreHealth(getPlayer);
-        }
-        return true;
-    }
-
     // riceve enemies e per ognuno avvia un thread
     public void startThreads(RealmList<AllEnemies> enemies){
         for (AllEnemies res:enemies) {

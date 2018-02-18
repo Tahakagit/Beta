@@ -55,12 +55,16 @@ public class NavigationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigation_drawer_exploring);
         helper = new RealmHelper();
+/*
         startUniverse();
+*/
 
         Realm mRealm = Realm.getDefaultInstance();
 
         context = this;
+/*
         isPlayer();
+*/
 
 
         listOfLocations = helper.getPlacesAtPLayerPosition();
@@ -160,27 +164,6 @@ public class NavigationActivity extends AppCompatActivity {
 
     }
 
-    // PLAYER INIT
-    public boolean isPlayer(){
-        /**
-         * Check if player already exists if not create it and set
-         * location
-         *
-         * todo set start point if !player
-         */
-        if (helper.getPlayer() == null){
-            Player player = new Player();
-            helper.addItem(player);
-        }else {
-            helper.resetLocation();
-            helper.restoreHealth(helper.getPlayer());
-        }
-        playerLocation = helper.getPlayerLocation();
-        if (playerLocation == null)
-            helper.setPlayerLocation(helper.getFirstStar());
-
-        return true;
-    }
 
     /**
      * START ENEMY SPAWN SERVICE

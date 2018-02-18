@@ -194,7 +194,6 @@ public class MyApplication extends Application {
 
             RealmHelper helper = new RealmHelper();
 
-            WorldManagementHelper worldHelper = new WorldManagementHelper(helper);
 
             while (true) {
                 Sleep(5000);
@@ -202,13 +201,7 @@ public class MyApplication extends Application {
                 List<String> enemiesNotBattleResults = helper.getNotFightingEnemies();
                 if (enemiesNotBattleResults.size() > 0) {
                     for (String enemy:enemiesNotBattleResults) {
-
-        /*
-                        String id = enemy.getId();
-        */
-        /*
-                        Sleep(5000);
-        */
+                        //todo implement pngs routine
                         String newLocation = helper.setEnemyLocation(enemy);
                         publishProgress();
 

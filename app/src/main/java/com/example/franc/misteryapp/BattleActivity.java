@@ -76,7 +76,9 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 */
 
         RealmList<AllEnemies> enemyqueue = helper.getEnemyQueue();
+/*
         startThreads(enemyqueue);
+*/
 
         listWeapons = findViewById(R.id.rv_weapons);
 
@@ -142,11 +144,9 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     }
 
     // riceve enemies e per ognuno avvia un thread
-    public void startThreads(RealmList<AllEnemies> enemies){
-        for (AllEnemies res:enemies) {
-            new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, res.getId());
+    public void startThreads(AllEnemies enemies){
+            new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, enemies.getId());
 
-        }
     }
 
     // genera N nemici
@@ -259,7 +259,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
             final RealmHelper backgroundHelper = new RealmHelper();
 */
             player = bHelper.getPlayer();
-            //
+            //todo
 
             if (arg0[0] == null)
                 cancel(true);
@@ -279,11 +279,13 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
                         if (isCancelled())
                             break;
 
-                        Sleep(2000);
-                        Log.d("Asynctask:", "IS ATTACKING");
-                        bHelper.dealDamage(player, 2);
-                        int salute = player.getHealth();
-                        publishProgress(salute);
+                        if (enemy.getAttacked()) {
+                            Sleep(2000);
+                            Log.d("Asynctask:", "IS ATTACKING");
+                            bHelper.dealDamage(player, 2);
+                            int salute = player.getHealth();
+                            publishProgress(salute);
+                        }
 
                     } finally {
                     }
@@ -336,22 +338,46 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-            //Remove swiped item from list and notify the RecyclerView
             int position = viewHolder.getAdapterPosition();
 
+            //WAIT FOR AMMO TO LOAD
             new reloadTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (MyWeaponsAdapter.ViewHolder)listWeapons.findViewHolderForAdapterPosition(0));
 
 
-            // rimuove on swipe il proiettile e ne ritorna in danno
+            //REMOVE AMMO FROM LIST AND RETURNS DAMAGE POWER
             int power = weaponsAdapter.deleteItemAt(position);
+
+            //DAMAGE SELECTED ENEMY WITH SWIPED AMMO
             helper.dealEnemyDamage(selectedEnemies.get(0), power);
+
+            //COMBAT MODE EXCLUDED FROM LIFE ROUTINE
+            helper.setEnemyAttacked(selectedEnemies.get(0).getId());
+
+            //START BATTLE ROUTINE
+
+
+
+            //OGNI SWIPE FA UN THREAD E SETTA ISATTACKED
+            startThreads(selectedEnemies.get(0));
             if (selectedEnemies.get(0).getHealth() <= 0){
+
+                //REMOVE ENEMY FROM BATTLE BUFFER
                 helper.removeEnemyFromQueue(selectedEnemies.get(0));
+
+                //REMOVE ENEMY FROM SELECTION
                 selectedEnemies.remove(selectedEnemies.get(0));
+
+                //NOTIFY IN BATTLE ENEMY ADAPTER: ENEMY NO LONGER EXISTS
                 enemyAdapter.notifyDataSetChanged();
+
+                //NOTIFY IN NAVIGATION ENEMY ADAPTER: ENEMY NO LONGER EXISTS
                 NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
+
+                //NO ENEMY NO BATTLEACTIVITY. WORKS ONLY WITH 1 ENEMY
                 finish();
             }
+
+            //NOTIFY IN BATTLE ENEMY ADAPTER: ENEMY HEALTH CHANGED
             enemyAdapter.notifyDataSetChanged();
         }
 

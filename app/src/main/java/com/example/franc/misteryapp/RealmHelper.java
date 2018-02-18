@@ -172,6 +172,19 @@ public class RealmHelper {
         return enemy;
     }
 
+    void setEnemyAttacked(final String enemyId){
+        mRealm = Realm.getDefaultInstance();
+        final AllEnemies enemi = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();
+
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                enemi.setAttacked(true);
+            }
+        });
+    }
+
+
     String setEnemyLocation(final String enemyId){
         mRealm = Realm.getDefaultInstance();
         final AllEnemies enemi = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();

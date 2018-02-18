@@ -69,4 +69,12 @@ public class AllEnemies extends RealmObject {
     public void setId(String id) {
         this.id = id;
     }
+
+    public Boolean getAttacked() {
+        return isAttacked;
+    }
+
+    public void setAttacked(Boolean attacked) {
+        isAttacked = attacked;
+    }
 }

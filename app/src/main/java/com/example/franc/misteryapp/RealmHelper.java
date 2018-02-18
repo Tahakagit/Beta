@@ -3,6 +3,8 @@ package com.example.franc.misteryapp;
 import android.provider.SyncStateContract;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nonnull;
@@ -141,6 +143,47 @@ public class RealmHelper {
         return health;
     }
 
+    List<String> getNotFightingEnemies(){
+        RealmResults<AllEnemies> allEnemies;
+        List<String> allEnemiesList = new ArrayList<>();
+        try {
+            mRealm = Realm.getDefaultInstance();
+            allEnemies = mRealm.where(AllEnemies.class).equalTo("isAttacked", false).findAll();
+
+            for (AllEnemies res:allEnemies) {
+                allEnemiesList.add(res.getId());
+            }
+        } finally {
+            mRealm.close();
+
+        }
+
+        return allEnemiesList;
+    }
+    AllEnemies getEnemyFromID(String enemyId){
+        mRealm = Realm.getDefaultInstance();
+        AllEnemies enemy;
+        try {
+            enemy = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();
+        } finally {
+
+        }
+
+        return enemy;
+    }
+
+    String setEnemyLocation(final String enemyId){
+        mRealm = Realm.getDefaultInstance();
+        final AllEnemies enemi = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();
+
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                enemi.setLocation(getRandomLocation());
+            }
+        });
+        return enemi.getLocation();
+    }
     // ADD ENEMY TO BATTLE QUEUE
     void addEnemyToQueue(@Nonnull final AllEnemies enemy){
         mRealm = Realm.getDefaultInstance();

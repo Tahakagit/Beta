@@ -5,9 +5,11 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by franc on 08/11/2017.
@@ -30,6 +32,7 @@ public class MyApplication extends Application {
 
         isPlayer();
         new SpawnEnemy().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new EnemyAction().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 
     }
@@ -148,6 +151,7 @@ public class MyApplication extends Application {
             final RealmHelper backgroundHelper = new RealmHelper();
 */
             //
+            helper.resetEnemies();
 
             while (true) {
                 worldHelper.spawnEnemy();
@@ -192,9 +196,28 @@ public class MyApplication extends Application {
 
             WorldManagementHelper worldHelper = new WorldManagementHelper(helper);
 
-            //todo helper.getAllEnemies()
-            //todo foreach enemie found whos not fighting enemyAction
-            return null;
+            while (true) {
+                Sleep(5000);
+
+                List<String> enemiesNotBattleResults = helper.getNotFightingEnemies();
+                if (enemiesNotBattleResults.size() > 0) {
+                    for (String enemy:enemiesNotBattleResults) {
+
+        /*
+                        String id = enemy.getId();
+        */
+        /*
+                        Sleep(5000);
+        */
+                        String newLocation = helper.setEnemyLocation(enemy);
+                        publishProgress();
+
+                        Log.d("tag",  helper.getEnemyFromID(enemy).getName() + " moved To " + newLocation);
+
+
+                    }
+                }
+            }
         }
 
         @Override

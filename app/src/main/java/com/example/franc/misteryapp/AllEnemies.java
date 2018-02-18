@@ -16,6 +16,7 @@ public class AllEnemies extends RealmObject {
     private boolean isSelected = false;
     private boolean isDead = false;
     private String id = null;
+    private Boolean isAttacked = false;
 
     public int getHealth() {
         return health;

@@ -393,6 +393,7 @@ public class RealmHelper {
                 @Override
                 public void execute(@Nonnull Realm realm) {
                     realFirst.setViewType(0);
+                    //todo verificare se è necessario
                     realm.insertOrUpdate(realFirst);
                 }
             });

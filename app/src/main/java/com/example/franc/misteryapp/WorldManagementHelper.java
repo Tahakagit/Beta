@@ -45,7 +45,8 @@ public class WorldManagementHelper {
         }
 
     }
-    // genera stringhe casuali
+
+    // GENERATE RANDOM STRING
     public String randomIdentifier() {
         final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
         final java.util.Random rand = new java.util.Random();
@@ -72,19 +73,8 @@ public class WorldManagementHelper {
         String newLocation = helper.getRandomLocation();
         enemy.setLocation(newLocation);
         enemy.setId(randomIdentifier());
-/*
-        Toast.makeText(NavigationActivity.context, "New enemy spawned @ " + newLocation, Toast.LENGTH_LONG).show();
-*/
-/*
-        NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
-*/
         helper.addItem(enemy);
-        Log.d("tag", "Spawning new enemy at   " + enemy.getLocation());
-
-
-/*
-        mRealm.close();
-*/
+        Log.d("Enemy AI spawn", "Spawning " + enemy.getName() + " at   " + enemy.getLocation());
     }
     public void deleteEnemy(AllEnemies enemy){
 

@@ -43,7 +43,6 @@ public class MyApplication extends Application {
          * Check if player already exists if not create it and set
          * location
          *
-         * todo set start point if !player
          */
         Player player = helper.getPlayer();
         helper.resetLocation();
@@ -142,7 +141,6 @@ public class MyApplication extends Application {
             final Player player;
             final AllEnemies enemies;
 
-            // todo remove this realm instance?
             RealmHelper helper = new RealmHelper();
 
             WorldManagementHelper worldHelper = new WorldManagementHelper(helper);
@@ -177,6 +175,7 @@ public class MyApplication extends Application {
 
     private class EnemyAction extends AsyncTask<Void, Void, Void> {
 
+        //todo to fix: enemy si sposta quando in battaglia
         /**
          *
          * @param ms Time to sleep
@@ -205,7 +204,7 @@ public class MyApplication extends Application {
                         String newLocation = helper.setEnemyLocation(enemy);
                         publishProgress();
 
-                        Log.d("tag",  helper.getEnemyFromID(enemy).getName() + " moved To " + newLocation);
+                        Log.d("Enemy AI action",  helper.getEnemyFromID(enemy).getName() + " moved To " + newLocation);
 
 
                     }

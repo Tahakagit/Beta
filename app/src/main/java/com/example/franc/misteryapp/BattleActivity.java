@@ -220,7 +220,6 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     /**
      * Enemy behaviour thread
      * Must reference db items from scratch
-     * Todo remove BackgroundRealmHelper usage
      *
      */
     private class BackgroundTask extends AsyncTask<String, Integer, Void>{
@@ -259,7 +258,6 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
             final RealmHelper backgroundHelper = new RealmHelper();
 */
             player = bHelper.getPlayer();
-            //todo
 
             if (arg0[0] == null)
                 cancel(true);
@@ -341,7 +339,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
             int position = viewHolder.getAdapterPosition();
 
             //WAIT FOR AMMO TO LOAD
-            new reloadTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (MyWeaponsAdapter.ViewHolder)listWeapons.findViewHolderForAdapterPosition(0));
+            new ReloadTask().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, (MyWeaponsAdapter.ViewHolder) listWeapons.findViewHolderForAdapterPosition(0));
 
 
             //REMOVE AMMO FROM LIST AND RETURNS DAMAGE POWER
@@ -350,15 +348,12 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
             //DAMAGE SELECTED ENEMY WITH SWIPED AMMO
             helper.dealEnemyDamage(selectedEnemies.get(0), power);
 
-            //COMBAT MODE EXCLUDED FROM LIFE ROUTINE
-            helper.setEnemyAttacked(selectedEnemies.get(0).getId());
-
-            //START BATTLE ROUTINE
-
-
-
-            //OGNI SWIPE FA UN THREAD E SETTA ISATTACKED
-            startThreads(selectedEnemies.get(0));
+            //SET ENEMYATTACKED IF NOT ALREADY SET
+            //THEN START ENEMY FIGHT BEAVHIOUR
+            if (selectedEnemies.get(0).getAttacked() == false){
+                helper.setEnemyAttacked(selectedEnemies.get(0).getId());
+                startThreads(selectedEnemies.get(0));
+            }
             if (selectedEnemies.get(0).getHealth() <= 0){
 
                 //REMOVE ENEMY FROM BATTLE BUFFER
@@ -385,7 +380,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     };
 
     // thread per il tempo di caricamento delle arrmi
-    private class reloadTask extends AsyncTask<MyWeaponsAdapter.ViewHolder, Void, Void> {
+    private class ReloadTask extends AsyncTask<MyWeaponsAdapter.ViewHolder, Void, Void> {
 
         MyWeaponsAdapter.ViewHolder currentHolder;
 

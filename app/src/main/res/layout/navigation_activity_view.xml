@@ -2,29 +2,62 @@
 <android.support.design.widget.CoordinatorLayout android:layout_height="match_parent"
     android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
 
     <LinearLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+
+        >
 
         <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:id="@+id/navigation_rv_locations">
-        </android.support.v7.widget.RecyclerView>
-        <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/navigation_rv_locations"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/navigation_rv_enemies">
+            >
+
         </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/navigation_rv_enemies"
+        app:layout_anchorGravity="top|center_horizontal"
+        android:layout_gravity="center|top"
+        app:layout_anchor="@id/bottom_sheet"
+
+        >
+    </android.support.v7.widget.RecyclerView>
+
+    <include layout="@layout/player_menu_bottomsheet"
+
+    >
+
+    </include>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        app:backgroundTint="?attr/colorPrimaryDark"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+
+        app:layout_anchor="@id/bottom_sheet"
+        app:layout_anchorGravity="top|end"
+        android:layout_gravity="center|top"
+        >
 
 
-    <include layout="@layout/fab_layout"/>
+    </android.support.design.widget.FloatingActionButton>
+
+
+    <include layout="@layout/fab_menu"/>
+
+
 </android.support.design.widget.CoordinatorLayout>
 

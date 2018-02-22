@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -77,6 +79,7 @@ public class NavigationActivity extends AppCompatActivity {
 /*
         startEnemyLifeService();
 */
+        startPlayerMenu();
         startLocationsRecyclerView();
         startEnemiesRecyclerView();
         startFab();
@@ -164,7 +167,6 @@ public class NavigationActivity extends AppCompatActivity {
 
     }
 
-
     /**
      * START ENEMY SPAWN SERVICE
      */
@@ -190,6 +192,48 @@ public class NavigationActivity extends AppCompatActivity {
         );
 
     }
+
+    // START PLAYER MENU
+    public void startPlayerMenu(){
+        BottomSheetBehavior bSBehavior;
+        LinearLayout ll;
+        MyWeaponsAdapter weaponsAdapter;
+        RealmResults<WeaponSet> weapons;
+        RecyclerView rVWeapons;
+        RecyclerView.LayoutManager mLayoutManagerWeapons;
+
+        weapons = generateWeapons(25);
+        mLayoutManagerWeapons = new LinearLayoutManager(this);
+
+        weaponsAdapter = new MyWeaponsAdapter(weapons, helper);
+
+        ll = findViewById(R.id.bottom_sheet);
+        rVWeapons = findViewById(R.id.rv_weapons_bottomsheet);
+        rVWeapons.setLayoutManager(mLayoutManagerWeapons);
+        rVWeapons.setAdapter(weaponsAdapter);
+
+        bSBehavior = BottomSheetBehavior.from(ll);
+    }
+
+    // inserisce N armi e ne restituisce il RealmResult
+    public RealmResults<WeaponSet> generateWeapons(int weaponsNumber){
+        helper.resetWeapons();
+        for (int i = 0 ; i < weaponsNumber ; i++){
+            WeaponSet weapons = new WeaponSet();
+            if (i == 0)
+                weapons.setViewType(0);
+            else
+                weapons.setViewType(1);
+            weapons.setWeaponName("Missile");
+            weapons.setWeaponDamage(3);
+            weapons.setWeapondID(randomIdentifier());
+
+            helper.addWeapon(weapons);
+        }
+
+        return helper.getWeapons();
+    }
+
 
     // START LOCATIONS RECYCLERVIEW
     public void startLocationsRecyclerView(){

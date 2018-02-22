@@ -9,11 +9,15 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -22,6 +26,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +35,7 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-public class NavigationActivity extends AppCompatActivity {
+public class NavigationActivity extends AppCompatActivity implements MenuFragmentGoTo.SendToDialogActivity{
 
     /**
      *
@@ -81,10 +86,19 @@ public class NavigationActivity extends AppCompatActivity {
 /*
         startEnemyLifeService();
 */
+/*
         startPlayerMenu();
+*/
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        PlayerSuperControlCommandOfDestiny controlCommandOfDestiny = new PlayerSuperControlCommandOfDestiny(helper, context, fragmentManager);
+        controlCommandOfDestiny.startFab();
+        controlCommandOfDestiny.startPlayerMenu();
         startLocationsRecyclerView();
         startEnemiesRecyclerView();
+/*
         startFab();
+*/
         startNavDrawer();
 
         mRealm.close();
@@ -115,7 +129,6 @@ public class NavigationActivity extends AppCompatActivity {
         }
 
     }
-
     // GENERA STRINGHE CASUALI
     public String randomIdentifier() {
         final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
@@ -133,6 +146,21 @@ public class NavigationActivity extends AppCompatActivity {
             }
         }
         return builder.toString();
+    }
+
+    /**
+     * SET PLAYER NEW LOCATION AND UPDATES UI
+     * IFACE CALLED FROM DIALOGFRAMENTGOTO
+     * @param star String new location to navigate to
+     */
+    public void navigateTo(String star) {
+        RealmHelper helper = new RealmHelper();
+        helper.setPlayerLocation(star);
+        NavigationActivity.navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
+        NavigationActivity.navigationAdapter.UpdateAdapter(helper.getPlacesAtPLayerPosition());
+/*
+        finish();
+*/
     }
 
     //NAVIGATION DRAWER
@@ -195,52 +223,11 @@ public class NavigationActivity extends AppCompatActivity {
 
     }
 
-    // START PLAYER MENU
-    public void startPlayerMenu(){
-        /**
-         *
-         *
-         *
-         * todo get player health
-         */
-        BottomSheetBehavior bSBehavior;
-        LinearLayout ll;
-        MyWeaponsAdapter weaponsAdapter;
-        RealmResults<WeaponSet> weapons;
-        RecyclerView rVWeapons;
-        RecyclerView.LayoutManager mLayoutManagerWeapons;
 
-        weapons = generateWeapons(25);
-        mLayoutManagerWeapons = new LinearLayoutManager(this);
 
-        weaponsAdapter = new MyWeaponsAdapter(weapons, helper);
 
-        ll = findViewById(R.id.bottom_sheet);
-        rVWeapons = findViewById(R.id.rv_weapons_bottomsheet);
-        rVWeapons.setLayoutManager(mLayoutManagerWeapons);
-        rVWeapons.setAdapter(weaponsAdapter);
 
-        bSBehavior = BottomSheetBehavior.from(ll);
-    }
 
-    // inserisce N armi e ne restituisce il RealmResult
-    public RealmResults<WeaponSet> generateWeapons(int weaponsNumber){
-        helper.resetWeapons();
-        for (int i = 0 ; i < weaponsNumber ; i++){
-            WeaponSet weapons = new WeaponSet();
-            if (i == 0)
-                weapons.setViewType(0);
-            else
-                weapons.setViewType(1);
-            weapons.setWeaponName("Missile");
-            weapons.setWeaponDamage(3);
-            weapons.setWeapondID(randomIdentifier());
-
-            helper.addWeapon(weapons);
-        }
-
-        return helper.getWeapons();
-    }
 
 
     // START LOCATIONS RECYCLERVIEW
@@ -262,60 +249,6 @@ public class NavigationActivity extends AppCompatActivity {
         list.setAdapter(navigationEnemyAdapter);
     }
 
-    // START FLOATING MENU
-    public void startFab(){
-        FloatingActionButton fab = findViewById(R.id.fab);
-        boolean clicked = false;
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view){
-                final FloatingActionButton fab1 = findViewById(R.id.fab_1);
-
-                if (fabClicked){
-                    // CLOSE FAB MENU
-                    final Animation hide_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.hide_fab_1);
-
-                    CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab1.getLayoutParams();
-                    layoutParams.rightMargin -= (int) (fab1.getWidth() * 1.7);
-/*
-                    layoutParams.bottomMargin -= (int) (fab1.getHeight() * 0.25);
-*/
-                    fab1.setLayoutParams(layoutParams);
-                    fab1.startAnimation(hide_fab_1);
-                    fab1.setClickable(false);
-                    fabClicked = false;
-
-                }else {
-                    //OPENS FAB MENU
-                    fabClicked = true;
-
-                    final Animation show_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.show_fab_1);
-
-                    CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab1.getLayoutParams();
-                    layoutParams.rightMargin += (int) (fab1.getWidth() * 1.7);
-/*
-                    layoutParams.bottomMargin += (int) (fab1.getHeight() * 0.25);
-*/
-                    fab1.setLayoutParams(layoutParams);
-
-                    fab1.startAnimation(show_fab_1);
-                    fab1.setClickable(true);
-                    fab1.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            final Intent intent = new Intent(NavigationActivity.this, DialogActivity.class);
-                            startActivity(intent);
-
-                        }
-                    });
-
-
-                }
-            }
-        });
-
-    }
 
     @Override
     protected void onStop() {

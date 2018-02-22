@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -45,6 +46,7 @@ public class NavigationActivity extends AppCompatActivity {
     static WorldManagementHelper worldHelper;
     static RealmResults<LocationRealmObject> listOfLocations;
     static Context context;
+    boolean fabClicked = false;
 
     static SpawnEnemyService enemyService;
 
@@ -195,6 +197,12 @@ public class NavigationActivity extends AppCompatActivity {
 
     // START PLAYER MENU
     public void startPlayerMenu(){
+        /**
+         *
+         *
+         *
+         * todo get player health
+         */
         BottomSheetBehavior bSBehavior;
         LinearLayout ll;
         MyWeaponsAdapter weaponsAdapter;
@@ -257,32 +265,53 @@ public class NavigationActivity extends AppCompatActivity {
     // START FLOATING MENU
     public void startFab(){
         FloatingActionButton fab = findViewById(R.id.fab);
+        boolean clicked = false;
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
-
+            public void onClick(View view){
                 final FloatingActionButton fab1 = findViewById(R.id.fab_1);
 
-                final Animation show_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.show_fab_1);
+                if (fabClicked){
+                    // CLOSE FAB MENU
+                    final Animation hide_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.hide_fab_1);
 
-                FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
-                layoutParams.rightMargin += (int) (fab1.getWidth() * 1.7);
-                layoutParams.bottomMargin += (int) (fab1.getHeight() * 0.25);
-                fab1.setLayoutParams(layoutParams);
+                    CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab1.getLayoutParams();
+                    layoutParams.rightMargin -= (int) (fab1.getWidth() * 1.7);
+/*
+                    layoutParams.bottomMargin -= (int) (fab1.getHeight() * 0.25);
+*/
+                    fab1.setLayoutParams(layoutParams);
+                    fab1.startAnimation(hide_fab_1);
+                    fab1.setClickable(false);
+                    fabClicked = false;
 
-                fab1.startAnimation(show_fab_1);
-                fab1.setClickable(true);
-                fab1.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        final Intent intent = new Intent(NavigationActivity.this, DialogActivity.class);
-                        startActivity(intent);
+                }else {
+                    //OPENS FAB MENU
+                    fabClicked = true;
 
-                    }
-                });
+                    final Animation show_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.show_fab_1);
 
+                    CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab1.getLayoutParams();
+                    layoutParams.rightMargin += (int) (fab1.getWidth() * 1.7);
+/*
+                    layoutParams.bottomMargin += (int) (fab1.getHeight() * 0.25);
+*/
+                    fab1.setLayoutParams(layoutParams);
+
+                    fab1.startAnimation(show_fab_1);
+                    fab1.setClickable(true);
+                    fab1.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            final Intent intent = new Intent(NavigationActivity.this, DialogActivity.class);
+                            startActivity(intent);
+
+                        }
+                    });
+
+
+                }
             }
         });
 

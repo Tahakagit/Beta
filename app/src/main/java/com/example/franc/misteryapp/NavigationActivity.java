@@ -12,6 +12,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -91,9 +92,12 @@ public class NavigationActivity extends AppCompatActivity implements MenuFragmen
 */
         FragmentManager fragmentManager = getSupportFragmentManager();
 
+        FloatingActionButton fab = findViewById(R.id.fab);
         PlayerSuperControlCommandOfDestiny controlCommandOfDestiny = new PlayerSuperControlCommandOfDestiny(helper, context, fragmentManager);
-        controlCommandOfDestiny.startFab();
-        controlCommandOfDestiny.startPlayerMenu();
+        controlCommandOfDestiny.startFab(fab);
+        LinearLayout ll = findViewById(R.id.bottom_sheet);
+        ViewPager vPager = findViewById(R.id.viewpager_player_menu);
+        controlCommandOfDestiny.startPlayerMenu(ll, vPager);
         startLocationsRecyclerView();
         startEnemiesRecyclerView();
 /*
@@ -104,6 +108,7 @@ public class NavigationActivity extends AppCompatActivity implements MenuFragmen
         mRealm.close();
     }
 
+/*
     public void startUniverse(){
         this.helper.resetUniverse();
         // creare routine di inserimento delle location
@@ -111,11 +116,11 @@ public class NavigationActivity extends AppCompatActivity implements MenuFragmen
 
         for (int i = 0; i < 4; i++) {
 
-            String sectorName = "Sector - " + randomIdentifier();
+            String sectorName = "SECTOR - " + randomIdentifier();
             for (int u = 0 ; u < 2 ; u++){
-                String starName = "Star - " + randomIdentifier();
+                String starName = "STAR - " + randomIdentifier();
                 for (int p = 0; p < 4; p++){
-                    String locationName = "Location - " + randomIdentifier();
+                    String locationName = "LOCATION - " + randomIdentifier();
                     LocationRealmObject location = new LocationRealmObject();
                     location.setLocationName(locationName);
                     location.setLocationStar(starName);
@@ -129,6 +134,8 @@ public class NavigationActivity extends AppCompatActivity implements MenuFragmen
         }
 
     }
+*/
+/*
     // GENERA STRINGHE CASUALI
     public String randomIdentifier() {
         final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
@@ -147,6 +154,7 @@ public class NavigationActivity extends AppCompatActivity implements MenuFragmen
         }
         return builder.toString();
     }
+*/
 
     /**
      * SET PLAYER NEW LOCATION AND UPDATES UI
@@ -197,9 +205,12 @@ public class NavigationActivity extends AppCompatActivity implements MenuFragmen
 
     }
 
-    /**
+/*
+    */
+/**
      * START ENEMY SPAWN SERVICE
-     */
+     *//*
+
     public void startEnemyLifeService(){
         Context ctx = getApplicationContext();
         Calendar cal = Calendar.getInstance();
@@ -222,6 +233,7 @@ public class NavigationActivity extends AppCompatActivity implements MenuFragmen
         );
 
     }
+*/
 
 
 

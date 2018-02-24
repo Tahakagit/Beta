@@ -21,6 +21,7 @@ package com.example.franc.misteryapp;
 
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -28,12 +29,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import javax.annotation.Nullable;
+
 import io.realm.RealmList;
 
 public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHolder> {
     private RealmList<AllEnemies> mDataset;
-    private OnItemSelectedListener iface;
-    private OnItemDeselectedListener iface2;
+    static OnItemSelectionListener iface;
     Activity activity;
 
 
@@ -63,13 +65,15 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyEnemyAdapter(RealmList<AllEnemies> myDataset, Activity activity) {
+    public MyEnemyAdapter(RealmList<AllEnemies> myDataset) {
         mDataset = myDataset;
         this.activity = activity;
-        this.iface = (OnItemSelectedListener) activity;
-        this.iface2 = (OnItemDeselectedListener) activity;
     }
 
+    // todo pasare interfaccia 2
+    public MyEnemyAdapter(OnItemSelectionListener callback) {
+        this.iface = callback;
+    }
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -79,7 +83,9 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
                 .inflate(R.layout.enemy_row, parent, false);
         // set the view's size, margins, paddings and layout parameters
 
+
         ViewHolder vh = new ViewHolder(v);
+
 
         return vh;
     }
@@ -87,6 +93,11 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        Resources res = holder.itemView.getContext().getResources();
+/*
+        holder.cv.setCardBackgroundColor(res.getColor(R.color.transparent));
+*/
+
         holder.mCardView.setText(mDataset.get(position).getName());
         holder.enemyHealth.setText(String.valueOf(mDataset.get(position).getHealth()));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -94,9 +105,9 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
             public void onClick(View view) {
 
                 if (!holder.isSelected){
-                    holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.cardview_light_background));
+                    holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.transparent));
                     holder.isSelected = true;
-                    iface2.onItemDeselected(mDataset.get(holder.getAdapterPosition()));
+                    iface.onItemDeselected(mDataset.get(holder.getAdapterPosition()));
                 }else {
                     holder.cv.setCardBackgroundColor(view.getResources().getColor(R.color.colorAccent));
                     holder.isSelected = false;
@@ -106,16 +117,14 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
 
         });
     }
-    public interface OnItemDeselectedListener {
+    public interface OnItemSelectionListener {
 
         void onItemDeselected(AllEnemies item);
-    }
-
-
-    public interface OnItemSelectedListener {
-
         void onItemSelected(AllEnemies item);
+
     }
+
+
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override

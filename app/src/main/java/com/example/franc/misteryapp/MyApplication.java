@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 /**
  * Created by franc on 08/11/2017.
@@ -32,7 +31,7 @@ public class MyApplication extends Application {
 
         isPlayer();
         new SpawnEnemy().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        new EnemyAction().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new EnemyRoutine().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 
     }
@@ -77,11 +76,11 @@ public class MyApplication extends Application {
 
         for (int i = 0; i < 4; i++) {
 
-            String sectorName = "Sector - " + randomIdentifier();
+            String sectorName = "SECTOR - " + randomIdentifier();
             for (int u = 0 ; u < 2 ; u++){
-                String starName = "Star - " + randomIdentifier();
+                String starName = "STAR - " + randomIdentifier();
                 for (int p = 0; p < 4; p++){
-                    String locationName = "Location - " + randomIdentifier();
+                    String locationName = "LOCATION - " + randomIdentifier();
                     LocationRealmObject location = new LocationRealmObject();
                     location.setLocationName(locationName);
                     location.setLocationStar(starName);
@@ -173,7 +172,7 @@ public class MyApplication extends Application {
 
     }
 
-    private class EnemyAction extends AsyncTask<Void, Void, Void> {
+    private class EnemyRoutine extends AsyncTask<Void, Void, Void> {
 
         //todo to fix: enemy si sposta quando in battaglia
         /**

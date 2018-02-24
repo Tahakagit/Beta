@@ -27,11 +27,11 @@ public class WorldManagementHelper {
 
         for (int i = 0; i < 4; i++) {
 
-            String sectorName = "Sector - " + randomIdentifier();
+            String sectorName = "SECTOR - " + randomIdentifier();
             for (int u = 0 ; u < 2 ; u++){
-                String starName = "Star - " + randomIdentifier();
+                String starName = "STAR - " + randomIdentifier();
                 for (int p = 0; p < 4; p++){
-                    String locationName = "Location - " + randomIdentifier();
+                    String locationName = "LOCATION - " + randomIdentifier();
                     LocationRealmObject location = new LocationRealmObject();
                     location.setLocationName(locationName);
                     location.setLocationStar(starName);

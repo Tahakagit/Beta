@@ -3,7 +3,10 @@ package com.example.franc.misteryapp;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -22,7 +26,7 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
-public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.OnItemSelectedListener, MyEnemyAdapter.OnItemDeselectedListener{
+public class BattleActivity extends AppCompatActivity implements MenuFragmentGoTo.SendToDialogActivity{
     TextView io;
     TextView weaponReload;
     Realm mRealm = null;
@@ -31,9 +35,8 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     static MyEnemyAdapter enemyAdapter;
     static MyWeaponsAdapter weaponsAdapter;
     static Context context;
-
-    //variabili per la generazione delle stringhe casuali
-
+    static TextView playerHealth;
+    static TextView playerEnergy;
 
     static RealmResults<WeaponSet> weapons;
     static RecyclerView list;
@@ -55,16 +58,20 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         helper = new RealmHelper();
         EnemyQueue enemyQueue = new EnemyQueue();
         context = this;
+        playerHealth = findViewById(R.id.id_textview_player_health);
+        playerEnergy = findViewById(R.id.id_textview_player_energy);
 
 /*
         Realm.init(this);
 */
+/*
         io = (TextView)findViewById(R.id.health);
+*/
 
 /*
         mEnemies = generateEnemies(2);
 */
-        enemyAdapter = new MyEnemyAdapter(helper.getEnemyQueue(), BattleActivity.this);
+        enemyAdapter = new MyEnemyAdapter(helper.getEnemyQueue());
 
         weapons = generateWeapons(25);
         weaponsAdapter = new MyWeaponsAdapter(weapons, helper);
@@ -80,19 +87,28 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         startThreads(enemyqueue);
 */
 
+        startPlayerMenu();
+/*
         listWeapons = findViewById(R.id.rv_weapons);
+*/
 
         list = (RecyclerView)findViewById(R.id.rv);
+/*
         mLayoutManagerWeapons = new LinearLayoutManager(this);
+*/
         mLayoutManager = new LinearLayoutManager(this);
         list.setLayoutManager(mLayoutManager);
+/*
         listWeapons.setLayoutManager(mLayoutManagerWeapons);
         listWeapons.setAdapter(weaponsAdapter);
+*/
 
         list.setAdapter(enemyAdapter);
 
+/*
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(listWeapons);
+*/
 
 /*
         RealmResults<WeaponSet> weapons = helper.getWeapons();
@@ -145,7 +161,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
     // riceve enemies e per ognuno avvia un thread
     public void startThreads(AllEnemies enemies){
-            new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, enemies.getId());
+            new EnemyFight().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, enemies.getId());
 
     }
 
@@ -161,6 +177,22 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
         existingEnemies = enemies;
 
         return existingEnemies;
+    }
+
+
+    /**
+     * SET PLAYER NEW LOCATION AND UPDATES UI
+     * IFACE CALLED FROM DIALOGFRAMENTGOTO
+     * @param star String new location to navigate to
+     */
+    public void navigateTo(String star) {
+        RealmHelper helper = new RealmHelper();
+        helper.setPlayerLocation(star);
+        NavigationActivity.navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
+        NavigationActivity.navigationAdapter.UpdateAdapter(helper.getPlacesAtPLayerPosition());
+/*
+        finish();
+*/
     }
 
     // inserisce N armi e ne restituisce il RealmResult
@@ -202,13 +234,12 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     }
 
     //rimuove dai selezionati l'elemento deselezionato
-    @Override
     public void onItemDeselected(AllEnemies item) {
         selectedEnemies.remove(item);
         helper.setEnemyUnselected(item);
     }
 
-    @Override
+
     public void onItemSelected(AllEnemies item) {
         selectedEnemies.add(item);
         helper.setEnemySelected(item);
@@ -219,10 +250,10 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
     /**
      * Enemy behaviour thread
-     * Must reference db items from scratch
+     * Pass id enemy string to start corresponding fight thread
      *
      */
-    private class BackgroundTask extends AsyncTask<String, Integer, Void>{
+    static class EnemyFight extends AsyncTask<String, Integer, Void>{
 
         /**
          *
@@ -249,11 +280,15 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
             final AllEnemies enemies;
 
             // todo remove this realm instance?
+/*
             mRealm = Realm.getDefaultInstance();
+*/
             RealmHelper bHelper = new RealmHelper();
             Realm realm = helper.getRealm();
             AllEnemies enemy = realm.where(AllEnemies.class).equalTo("id", arg0[0]).findFirst();
+/*
             realm.close();
+*/
 /*
             final RealmHelper backgroundHelper = new RealmHelper();
 */
@@ -298,9 +333,10 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
 
         @Override
         protected void onProgressUpdate(Integer... values){
-            io.setText(String.valueOf(values[0]));
+            playerHealth.setText(String.valueOf(values[0]));
 
         }
+
 
         @Override
         protected void onCancelled() {
@@ -310,6 +346,18 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     }
 
 
+    private void startPlayerMenu(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        PlayerSuperControlCommandOfDestiny controlCommandOfDestiny = new PlayerSuperControlCommandOfDestiny(helper, context, fragmentManager);
+/*
+        FloatingActionButton fab = findViewById(R.id.fab);
+        controlCommandOfDestiny.startFab(fab);
+*/
+        LinearLayout ll = findViewById(R.id.bottom_sheet);
+        ViewPager vPager = findViewById(R.id.viewpager_player_menu);
+        controlCommandOfDestiny.startPlayerMenu(ll, vPager);
+
+    }
 
 
     // interfaccia per il controllo dello swipe delle armi
@@ -380,7 +428,7 @@ public class BattleActivity extends AppCompatActivity implements MyEnemyAdapter.
     };
 
     // thread per il tempo di caricamento delle arrmi
-    private class ReloadTask extends AsyncTask<MyWeaponsAdapter.ViewHolder, Void, Void> {
+    static class ReloadTask extends AsyncTask<MyWeaponsAdapter.ViewHolder, Void, Void> {
 
         MyWeaponsAdapter.ViewHolder currentHolder;
 

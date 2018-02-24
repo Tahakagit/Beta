@@ -2,17 +2,20 @@ package com.example.franc.misteryapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
@@ -25,21 +28,21 @@ import io.realm.RealmResults;
  * Created by franc on 22/02/2018.
  */
 
-public class PlayerSuperControlCommandOfDestiny implements MenuFragmentGoTo.SendToDialogActivity {
+public class PlayerSuperControlCommandOfDestiny {
 
     RealmHelper helper;
     Context context;
     FragmentManager fragmentManager;
     boolean fabClicked = false;
 
-    public PlayerSuperControlCommandOfDestiny(RealmHelper helper, Context context, FragmentManager fManager) {
+    PlayerSuperControlCommandOfDestiny(RealmHelper helper, Context context, FragmentManager fManager) {
         this.helper = helper;
         this.context = context;
         this.fragmentManager = fManager;
     }
 
     // START PLAYER MENU
-    public void startPlayerMenu(){
+    void startPlayerMenu(LinearLayout bottomSheet, ViewPager vPager){
         /**
          *
          *
@@ -47,34 +50,53 @@ public class PlayerSuperControlCommandOfDestiny implements MenuFragmentGoTo.Send
          * todo get player health
          */
 
+
         BottomSheetBehavior bSBehavior;
-        LinearLayout ll;
-        MyWeaponsAdapter weaponsAdapter;
         final ArrayList<Fragment> fragments = new ArrayList <>();
 
-
-        RealmResults<WeaponSet> weapons;
-        RecyclerView rVWeapons;
-        RecyclerView.LayoutManager mLayoutManagerWeapons;
-
-        weapons = generateWeapons(25);
-        mLayoutManagerWeapons = new LinearLayoutManager(context);
-
-        weaponsAdapter = new MyWeaponsAdapter(weapons, helper);
-        ll = ((NavigationActivity)context).getWindow().peekDecorView().findViewById(R.id.bottom_sheet);
-
-/*
-        ll = context.(R.id.bottom_sheet);
-*/
-/*
-        rVWeapons = findViewById(R.id.rv_weapons_bottomsheet);
-        rVWeapons.setLayoutManager(mLayoutManagerWeapons);
-        rVWeapons.setAdapter(weaponsAdapter);
-*/
-
-        bSBehavior = BottomSheetBehavior.from(ll);
+        bSBehavior = BottomSheetBehavior.from(bottomSheet);
+        fragments.add(new MenuFragmentWeapons());
         fragments.add(new MenuFragmentGoTo());
+        final Button menuPrev = bottomSheet.findViewById(R.id.id_btn_player_prev);
+        final Button menuNext = bottomSheet.findViewById(R.id.id_btn_player_next);
+
+
+        bSBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_HIDDEN:{
+                        menuPrev.setText("");
+                        menuNext.setText("");
+                    }
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED: {
+                        menuPrev.setText("PREV");
+                        menuNext.setText("NEXT");
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_COLLAPSED: {
+                        menuPrev.setText("");
+                        menuNext.setText("");
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        break;
+                }
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+        ViewPageAdapterPlayerMenu vpAdapter = new ViewPageAdapterPlayerMenu(fragmentManager, fragments);
+
         startFragmentsInActivityDialog(fragments);
+        vPager.setAdapter(vpAdapter);
 
     }
 
@@ -94,7 +116,7 @@ public class PlayerSuperControlCommandOfDestiny implements MenuFragmentGoTo.Send
     }
 
     // inserisce N armi e ne restituisce il RealmResult
-    public RealmResults<WeaponSet> generateWeapons(int weaponsNumber){
+    private RealmResults<WeaponSet> generateWeapons(int weaponsNumber){
         helper.resetWeapons();
         for (int i = 0 ; i < weaponsNumber ; i++){
             WeaponSet weapons = new WeaponSet();
@@ -113,7 +135,7 @@ public class PlayerSuperControlCommandOfDestiny implements MenuFragmentGoTo.Send
     }
 
     // GENERA STRINGHE CASUALI
-    public String randomIdentifier() {
+    private String randomIdentifier() {
         final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
         final java.util.Random rand = new java.util.Random();
         final Set<String> identifiers = new HashSet<String>();
@@ -136,20 +158,22 @@ public class PlayerSuperControlCommandOfDestiny implements MenuFragmentGoTo.Send
      *
      * @param fragmentsArrayList arraylist filled with fragments to show
      */
-    public void startFragmentsInActivityDialog(ArrayList<Fragment> fragmentsArrayList){
+    private void startFragmentsInActivityDialog(ArrayList<Fragment> fragmentsArrayList){
         int i = 0;
 
+
+/*
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         for (Fragment frag:fragmentsArrayList) {
             fragmentTransaction.add(R.id.fragmentcontainer, frag);
         }
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+*/
     }
 
     // START FLOATING MENU
-    public void startFab(){
-        FloatingActionButton fab = ((NavigationActivity)context).getWindow().peekDecorView().findViewById(R.id.fab);;
+    public void startFab(FloatingActionButton fab){
         boolean clicked = false;
 
         fab.setOnClickListener(new View.OnClickListener() {

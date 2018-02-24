@@ -1,9 +1,13 @@
 package com.example.franc.misteryapp;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -77,14 +81,16 @@ public class MyNavigationEnemyAdapter extends RecyclerView.Adapter<MyNavigationE
         // - replace the contents of the view with that element
         holder.mCardView.setText(mDataset.get(position).getName());
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener(){
+        holder.itemView.setOnClickListener(new View.OnClickListener(){
 
             @Override
-            public boolean onLongClick(View view) {
+            public void onClick(View view) {
                 //creating a popup menu
-                PopupMenu popup = new PopupMenu(NavigationActivity.context, holder.itemView);
+                // todo must become popup window
+                PopupMenu popup = new PopupMenu(NavigationActivity.context, holder.itemView, 1, R.style.GreenText, 0);
                 //inflating menu from xml resource
                 popup.inflate(R.menu.option_menu_enemy);
+
                 //adding click listener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 
@@ -108,16 +114,12 @@ public class MyNavigationEnemyAdapter extends RecyclerView.Adapter<MyNavigationE
                             case R.id.menu2:
                                 //handle menu2 click
                                 break;
-                            case R.id.menu3:
-                                //handle menu3 click
-                                break;
                         }
                         return false;
                     }
                 });
                 //displaying the popup
                 popup.show();
-                return false;
             }
 
         });

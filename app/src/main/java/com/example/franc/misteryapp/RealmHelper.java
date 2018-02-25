@@ -143,25 +143,25 @@ public class RealmHelper {
         return health;
     }
 
-    List<String> getNotFightingEnemies(){
+    List<Enemy> getNotFightingEnemies(){
         RealmResults<AllEnemies> allEnemies;
-        List<String> allEnemiesList = new ArrayList<>();
-        try {
-            mRealm = Realm.getDefaultInstance();
-            allEnemies = mRealm.where(AllEnemies.class).equalTo("isAttacked", false).findAll();
+        List<Enemy> updatedEnemyList = new ArrayList<>();
+        Realm mRealm = Realm.getDefaultInstance();
+        allEnemies = mRealm.where(AllEnemies.class).equalTo("isAttacked", false).findAll();
 
-            for (AllEnemies res:allEnemies) {
-                allEnemiesList.add(res.getId());
-            }
-        } finally {
-            mRealm.close();
-
+        for (AllEnemies res:allEnemies) {
+            Enemy enemyObj = new Enemy();
+            enemyObj.setId(res.getId());
+            enemyObj.setName(res.getName());
+            enemyObj.setHealth(res.getHealth());
+            enemyObj.setLocation(res.getLocation());
+            updatedEnemyList.add(enemyObj);
         }
-
-        return allEnemiesList;
+        mRealm.close();
+        return updatedEnemyList;
     }
     AllEnemies getEnemyFromID(String enemyId){
-        mRealm = Realm.getDefaultInstance();
+        Realm mRealm = Realm.getDefaultInstance();
         AllEnemies enemy;
         try {
             enemy = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();
@@ -185,14 +185,14 @@ public class RealmHelper {
     }
 
 
-    String setEnemyLocation(final String enemyId){
+    String setEnemyLocation(final String enemyId, final String location){
         mRealm = Realm.getDefaultInstance();
         final AllEnemies enemi = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();
 
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                enemi.setLocation(getRandomLocation());
+                enemi.setLocation(location);
             }
         });
         return enemi.getLocation();
@@ -454,13 +454,13 @@ public class RealmHelper {
     }
 
 
-    public void delEnemy(){
+    public void delEnemy(final String id){
 
             mRealm = Realm.getDefaultInstance();
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    AllEnemies item = mRealm.where(AllEnemies.class).equalTo("isDead", true).findFirst();
+                    AllEnemies item = mRealm.where(AllEnemies.class).equalTo("id", id).findFirst();
                     item.deleteFromRealm();
                 }
             });

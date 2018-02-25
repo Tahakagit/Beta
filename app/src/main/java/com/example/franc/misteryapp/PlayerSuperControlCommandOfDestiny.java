@@ -197,6 +197,9 @@ public class PlayerSuperControlCommandOfDestiny {
 
                 }else {
                     //OPENS FAB MENU
+
+                    Enemy spawnEnemyService = new Enemy();
+                    spawnEnemyService.stopSpawning();
                     fabClicked = true;
 
                     final Animation show_fab_1 = AnimationUtils.loadAnimation(((NavigationActivity) context).getApplication(), R.anim.show_fab_1);

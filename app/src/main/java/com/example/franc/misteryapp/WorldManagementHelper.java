@@ -68,13 +68,10 @@ public class WorldManagementHelper {
     public void spawnEnemy(){
 
         mRealm = helper.getRealm();
-        AllEnemies enemy = new AllEnemies();
-        enemy.setName("ship - " + randomIdentifier());
         String newLocation = helper.getRandomLocation();
-        enemy.setLocation(newLocation);
-        enemy.setId(randomIdentifier());
-        helper.addItem(enemy);
-        Log.d("Enemy AI spawn", "Spawning " + enemy.getName() + " at   " + enemy.getLocation());
+
+        Enemy enemy = new Enemy("ship - " + randomIdentifier(), randomIdentifier(), newLocation);
+        Log.d("Enemy AI spawn", "Spawning " + enemy.getName() + " at   " + newLocation);
     }
     public void deleteEnemy(AllEnemies enemy){
 

@@ -28,10 +28,7 @@ import io.realm.RealmResults;
 
 public class BattleActivity extends AppCompatActivity implements MenuFragmentGoTo.SendToDialogActivity{
     TextView io;
-    TextView weaponReload;
-    Realm mRealm = null;
     static RealmHelper helper;
-    static Player  getPlayer = null;
     static MyEnemyAdapter enemyAdapter;
     static MyWeaponsAdapter weaponsAdapter;
     static Context context;
@@ -40,10 +37,6 @@ public class BattleActivity extends AppCompatActivity implements MenuFragmentGoT
 
     static RealmResults<WeaponSet> weapons;
     static RecyclerView list;
-    static RecyclerView listWeapons;
-
-    static ArrayList<Enemy> mEnemies = new ArrayList<>();
-    static RealmList<AllEnemies> selectedEnemies = new RealmList<>();
 
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.LayoutManager mLayoutManagerWeapons;
@@ -61,67 +54,17 @@ public class BattleActivity extends AppCompatActivity implements MenuFragmentGoT
         playerHealth = findViewById(R.id.id_textview_player_health);
         playerEnergy = findViewById(R.id.id_textview_player_energy);
 
-/*
-        Realm.init(this);
-*/
-/*
-        io = (TextView)findViewById(R.id.health);
-*/
-
-/*
-        mEnemies = generateEnemies(2);
-*/
         enemyAdapter = new MyEnemyAdapter(helper.getEnemyQueue());
 
         weapons = generateWeapons(25);
         weaponsAdapter = new MyWeaponsAdapter(weapons, helper);
 
         startNavDrawer();
-        //crea Realmobject Player se non esiste e ricarica energia
-/*
-        isPlayer();
-*/
-
-        RealmList<AllEnemies> enemyqueue = helper.getEnemyQueue();
-/*
-        startThreads(enemyqueue);
-*/
-
         startPlayerMenu();
-/*
-        listWeapons = findViewById(R.id.rv_weapons);
-*/
-
-        list = (RecyclerView)findViewById(R.id.rv);
-/*
-        mLayoutManagerWeapons = new LinearLayoutManager(this);
-*/
+        list = findViewById(R.id.rv);
         mLayoutManager = new LinearLayoutManager(this);
         list.setLayoutManager(mLayoutManager);
-/*
-        listWeapons.setLayoutManager(mLayoutManagerWeapons);
-        listWeapons.setAdapter(weaponsAdapter);
-*/
-
         list.setAdapter(enemyAdapter);
-
-/*
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(listWeapons);
-*/
-
-/*
-        RealmResults<WeaponSet> weapons = helper.getWeapons();
-        weapons.addChangeListener(new RealmChangeListener<RealmResults<WeaponSet>>() {
-            @Override
-            public void onChange(RealmResults<WeaponSet> weaponSets) {
-                helper.setFirst();
-                weaponsAdapter.notifyDataSetChanged();
-            }
-        });
-*/
-
-
     }
 
 
@@ -163,20 +106,6 @@ public class BattleActivity extends AppCompatActivity implements MenuFragmentGoT
     public void startThreads(AllEnemies enemies){
             new EnemyFight().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, enemies.getId());
 
-    }
-
-    // genera N nemici
-    public ArrayList<Enemy> generateEnemies(int enemiesNumber){
-        ArrayList<Enemy> enemies = new ArrayList<>();
-
-        for (int i = 0 ; i < enemiesNumber ; i++){
-            Enemy enemy = new Enemy();
-            enemy.setName(randomIdentifier());
-            enemies.add(enemy);
-        }
-        existingEnemies = enemies;
-
-        return existingEnemies;
     }
 
 
@@ -231,18 +160,6 @@ public class BattleActivity extends AppCompatActivity implements MenuFragmentGoT
             }
         }
         return builder.toString();
-    }
-
-    //rimuove dai selezionati l'elemento deselezionato
-    public void onItemDeselected(AllEnemies item) {
-        selectedEnemies.remove(item);
-        helper.setEnemyUnselected(item);
-    }
-
-
-    public void onItemSelected(AllEnemies item) {
-        selectedEnemies.add(item);
-        helper.setEnemySelected(item);
     }
 
 
@@ -360,72 +277,6 @@ public class BattleActivity extends AppCompatActivity implements MenuFragmentGoT
     }
 
 
-    // interfaccia per il controllo dello swipe delle armi
-    ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
-
-
-        @Override
-        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-
-            return false;
-        }
-
-        // inizializza le direzioni di swipe, null se non è swipabile
-        @Override
-        public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            if (viewHolder.getItemViewType() > 0) return 0;
-            return super.getSwipeDirs(recyclerView, viewHolder);
-        }
-
-        @Override
-        public boolean isItemViewSwipeEnabled() {
-            return super.isItemViewSwipeEnabled();
-        }
-
-        @Override
-        public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-            int position = viewHolder.getAdapterPosition();
-
-            //WAIT FOR AMMO TO LOAD
-            new ReloadTask().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, (MyWeaponsAdapter.ViewHolder) listWeapons.findViewHolderForAdapterPosition(0));
-
-
-            //REMOVE AMMO FROM LIST AND RETURNS DAMAGE POWER
-            int power = weaponsAdapter.deleteItemAt(position);
-
-            //DAMAGE SELECTED ENEMY WITH SWIPED AMMO
-            helper.dealEnemyDamage(selectedEnemies.get(0), power);
-
-            //SET ENEMYATTACKED IF NOT ALREADY SET
-            //THEN START ENEMY FIGHT BEAVHIOUR
-            if (selectedEnemies.get(0).getAttacked() == false){
-                helper.setEnemyAttacked(selectedEnemies.get(0).getId());
-                startThreads(selectedEnemies.get(0));
-            }
-            if (selectedEnemies.get(0).getHealth() <= 0){
-
-                //REMOVE ENEMY FROM BATTLE BUFFER
-                helper.removeEnemyFromQueue(selectedEnemies.get(0));
-
-                //REMOVE ENEMY FROM SELECTION
-                selectedEnemies.remove(selectedEnemies.get(0));
-
-                //NOTIFY IN BATTLE ENEMY ADAPTER: ENEMY NO LONGER EXISTS
-                enemyAdapter.notifyDataSetChanged();
-
-                //NOTIFY IN NAVIGATION ENEMY ADAPTER: ENEMY NO LONGER EXISTS
-                NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
-
-                //NO ENEMY NO BATTLEACTIVITY. WORKS ONLY WITH 1 ENEMY
-                finish();
-            }
-
-            //NOTIFY IN BATTLE ENEMY ADAPTER: ENEMY HEALTH CHANGED
-            enemyAdapter.notifyDataSetChanged();
-        }
-
-
-    };
 
     // thread per il tempo di caricamento delle arrmi
     static class ReloadTask extends AsyncTask<MyWeaponsAdapter.ViewHolder, Void, Void> {

@@ -6,9 +6,11 @@ import android.util.Log;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by franc on 08/11/2017.
@@ -16,6 +18,7 @@ import io.realm.Realm;
 
 public class MyApplication extends Application {
     static String playerLocation;
+    Enemy enemy = new Enemy();
 
 
     RealmHelper helper = new RealmHelper();
@@ -30,8 +33,12 @@ public class MyApplication extends Application {
         startUniverse();
 
         isPlayer();
+        Enemy enemyControl = new Enemy();
+
+        enemyControl.startSpawnEnemies();
+/*
         new SpawnEnemy().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        new EnemyRoutine().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+*/
 
 
     }
@@ -115,115 +122,25 @@ public class MyApplication extends Application {
         return builder.toString();
     }
 
-    private class SpawnEnemy extends AsyncTask<Void, Void, Void> {
 
-        /**
-         *
-         * @param ms Time to sleep
-         */
-        void Sleep(int ms){
-            try{
-                Thread.sleep(ms);
-            }
-            catch (Exception e){
-            }
+    // GET RANDOM LOCATION
+    String getRandomLocation(){
+        Realm mRealm = Realm.getDefaultInstance();
+
+        Random r = new Random();
+        String randomStarSystem;
+        try {
+            int getSize = mRealm.where(LocationRealmObject.class).findAll().size();
+            int Low = 10;
+            int High = getSize;
+            int Result = r.nextInt(High-Low) + Low;
+            RealmResults<LocationRealmObject> location = mRealm.where(LocationRealmObject.class).equalTo("locationId", Result).findAll();
+            randomStarSystem = location.get(0).getLocationStar();
+        } finally {
+            mRealm.close();
         }
-
-        /**
-         *
-         *
-         * @param arg0
-         * @return
-         */
-        @Override
-        protected Void doInBackground(final Void... arg0) {
-            final Player player;
-            final AllEnemies enemies;
-
-            RealmHelper helper = new RealmHelper();
-
-            WorldManagementHelper worldHelper = new WorldManagementHelper(helper);
-
-/*
-            final RealmHelper backgroundHelper = new RealmHelper();
-*/
-            //
-            helper.resetEnemies();
-
-            while (true) {
-                worldHelper.spawnEnemy();
-                publishProgress();
-                Sleep(5000);
-            }
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values){
-            NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
-
-        }
-
-        @Override
-        protected void onCancelled() {
-/*
-            NavigationActivity.navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
-*/
-        }
-
+        return randomStarSystem;
     }
 
-    private class EnemyRoutine extends AsyncTask<Void, Void, Void> {
-
-        //todo to fix: enemy si sposta quando in battaglia
-        /**
-         *
-         * @param ms Time to sleep
-         */
-        void Sleep(int ms){
-            try{
-                Thread.sleep(ms);
-            }
-            catch (Exception e){
-            }
-        }
-
-        @Override
-        protected Void doInBackground(final Void... arg0) {
-
-            RealmHelper helper = new RealmHelper();
-
-
-            while (true) {
-                Sleep(5000);
-
-                List<String> enemiesNotBattleResults = helper.getNotFightingEnemies();
-                if (enemiesNotBattleResults.size() > 0) {
-                    for (String enemy:enemiesNotBattleResults) {
-                        //todo implement pngs routine
-                        String newLocation = helper.setEnemyLocation(enemy);
-                        publishProgress();
-
-                        Log.d("Enemy AI action",  helper.getEnemyFromID(enemy).getName() + " moved To " + newLocation);
-
-
-                    }
-                }
-            }
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values){
-            NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
-
-        }
-
-        @Override
-        protected void onCancelled() {
-/*
-            NavigationActivity.navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
-*/
-        }
-
-    }
 
 }

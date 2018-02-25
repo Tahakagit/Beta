@@ -35,9 +35,10 @@ public class MenuFragmentWeapons extends Fragment implements MyEnemyAdapter.OnIt
     static RealmHelper helper = new RealmHelper();
     MyWeaponsAdapter weaponsAdapter;
     // todo diventa List<Enemy> 2
-    static RealmList<AllEnemies> selectedEnemies = new RealmList<>();
+    static List<Enemy> selectedEnemies = new ArrayList<>();
     private MyEnemyAdapter enemyAdapter;
 
+    OnEnemyGone iface;
 
 
     @Override
@@ -51,6 +52,12 @@ public class MenuFragmentWeapons extends Fragment implements MyEnemyAdapter.OnIt
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_dialog_weapons, container, false);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        iface = (OnEnemyGone) context;
     }
 
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
@@ -116,16 +123,16 @@ public class MenuFragmentWeapons extends Fragment implements MyEnemyAdapter.OnIt
 
     //todo diventa List<Enemy> 3
     @Override
-    public void onItemDeselected(AllEnemies item) {
+    public void onItemDeselected(Enemy item) {
         selectedEnemies.remove(item);
-        helper.setEnemyUnselected(item);
+        item.setSelected(false);
 
     }
 
     @Override
-    public void onItemSelected(AllEnemies item) {
+    public void onItemSelected(Enemy item) {
         selectedEnemies.add(item);
-        helper.setEnemySelected(item);
+        item.setSelected(true);
 
     }
 
@@ -163,7 +170,10 @@ public class MenuFragmentWeapons extends Fragment implements MyEnemyAdapter.OnIt
             int power = weaponsAdapter.deleteItemAt(position);
 
             //DAMAGE SELECTED ENEMY WITH SWIPED AMMO
+/*
             helper.dealEnemyDamage(selectedEnemies.get(0), power);
+*/
+            selectedEnemies.get(0).getDamage(power);
 
             //SET ENEMYATTACKED IF NOT ALREADY SET
             //THEN START ENEMY FIGHT BEAVHIOUR
@@ -174,7 +184,11 @@ public class MenuFragmentWeapons extends Fragment implements MyEnemyAdapter.OnIt
             if (selectedEnemies.get(0).getHealth() <= 0){
 
                 //REMOVE ENEMY FROM BATTLE BUFFER
+/*
                 helper.removeEnemyFromQueue(selectedEnemies.get(0));
+*/
+                iface.onEnemyGone(selectedEnemies.get(0));
+
 
                 //REMOVE ENEMY FROM SELECTION
                 selectedEnemies.remove(selectedEnemies.get(0));
@@ -197,9 +211,15 @@ public class MenuFragmentWeapons extends Fragment implements MyEnemyAdapter.OnIt
 
 
     };
+    public interface OnEnemyGone {
+
+        void onEnemyGone(Enemy item);
+
+    }
+
 
     // riceve enemies e per ognuno avvia un thread
-    public void startThreads(AllEnemies enemies){
+    public void startThreads(Enemy enemies){
         //
 /*
         new EnemyFight().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, enemies.getId());

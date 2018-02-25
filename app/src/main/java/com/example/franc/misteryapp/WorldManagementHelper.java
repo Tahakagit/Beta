@@ -67,7 +67,6 @@ public class WorldManagementHelper {
 
     public void spawnEnemy(){
 
-        mRealm = helper.getRealm();
         String newLocation = helper.getRandomLocation();
 
         Enemy enemy = new Enemy("ship - " + randomIdentifier(), randomIdentifier(), newLocation);

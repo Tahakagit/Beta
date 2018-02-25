@@ -56,6 +56,12 @@ public class Enemy{
 
 
     public Enemy(){}
+    public Enemy fetchById(String enemyId){
+        Enemy retrievedEnemy = helper.getEnemyFromID(enemyId);
+
+
+        return retrievedEnemy;
+    }
 
     public List<Enemy> fetchNotFighting(){
         List<Enemy> updatedEnemyList = new ArrayList<>();
@@ -90,7 +96,7 @@ public class Enemy{
     }
 
     public void getDamage(int damage){
-        this.health = this.health - damage;
+        this.health = helper.dealEnemyDamage(id, damage);
     }
 
     public String getId() {
@@ -108,6 +114,14 @@ public class Enemy{
     public void setLocation(String location) {
         this.location = location;
         helper.setEnemyLocation(id, location);
+    }
+
+    public Boolean getAttacked() {
+        return isAttacked;
+    }
+
+    public void setAttacked(Boolean attacked) {
+        isAttacked = attacked;
     }
 
     private class SpawnEnemy extends AsyncTask<Void, Void, Void> {
@@ -152,7 +166,10 @@ public class Enemy{
         @Override
         protected void onProgressUpdate(Void... values){
             try {
-                NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
+
+                NavigationActivity.navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
+/*                NavigationActivity.navigationAdapter.UpdateAdapter(helper.getPlacesAtPLayerPosition());
+*/
 
             } catch (NullPointerException e) {
                 Log.e("SpawnEnemy", "Failed to update navigationEnemyAdapter " + e);
@@ -208,7 +225,7 @@ public class Enemy{
 */
                         publishProgress();
 
-                        Log.d("Enemy AI action",  enemy.getName() + " moved To " + enemy.getLocation());
+                        Log.d("Enemy AI action",  enemy.getName() + " moved" + enemy.getLocation());
 
 
                     }
@@ -220,7 +237,10 @@ public class Enemy{
 
         @Override
         protected void onProgressUpdate(Void... values){
-            NavigationActivity.navigationEnemyAdapter.notifyDataSetChanged();
+
+            NavigationActivity.navigationEnemyAdapter.UpdateAdapter(helper.getEnemiesAtPLayerPosition());
+/*            NavigationActivity.navigationAdapter.UpdateAdapter(helper.getPlacesAtPLayerPosition());
+*/
 
         }
 

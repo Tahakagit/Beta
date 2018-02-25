@@ -29,12 +29,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import io.realm.RealmList;
 
 public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHolder> {
-    private RealmList<AllEnemies> mDataset;
+    private List<Enemy> mDataset;
     static OnItemSelectionListener iface;
     Activity activity;
 
@@ -65,7 +67,7 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
     }
 
     // todo diventa list<Enemy> 1
-    public MyEnemyAdapter(RealmList<AllEnemies> myDataset) {
+    public MyEnemyAdapter(List<Enemy> myDataset) {
         mDataset = myDataset;
         this.activity = activity;
     }
@@ -118,8 +120,8 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
     }
     public interface OnItemSelectionListener {
 
-        void onItemDeselected(AllEnemies item);
-        void onItemSelected(AllEnemies item);
+        void onItemDeselected(Enemy item);
+        void onItemSelected(Enemy item);
 
     }
 

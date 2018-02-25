@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import java.util.List;
+
 import io.realm.RealmResults;
 
 /**
@@ -22,8 +24,9 @@ import io.realm.RealmResults;
  */
 
 public class MyNavigationEnemyAdapter extends RecyclerView.Adapter<MyNavigationEnemyAdapter.ViewHolder> {
-    private RealmResults<AllEnemies> mDataset;
+    private List<Enemy> mDataset;
     Activity activity;
+    static OnEnemyApproached iface;
 
 
     // Provide a reference to the views for each data item
@@ -51,12 +54,15 @@ public class MyNavigationEnemyAdapter extends RecyclerView.Adapter<MyNavigationE
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyNavigationEnemyAdapter(RealmResults<AllEnemies> myDataset) {
+    public MyNavigationEnemyAdapter(List<Enemy> myDataset) {
         mDataset = myDataset;
+    }
+    public MyNavigationEnemyAdapter(OnEnemyApproached callback) {
+        this.iface = callback;
     }
 
 
-    public  void UpdateAdapter(RealmResults<AllEnemies> newDataset){
+    public  void UpdateAdapter(List<Enemy> newDataset){
 
         mDataset = newDataset;
         notifyDataSetChanged();
@@ -79,6 +85,10 @@ public class MyNavigationEnemyAdapter extends RecyclerView.Adapter<MyNavigationE
     public void onBindViewHolder(final ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
+/*
+        Enemy enemy = new Enemy();
+        enemy.fetchById(mDataset.get(position).getId());
+*/
         holder.mCardView.setText(mDataset.get(position).getName());
 
         holder.itemView.setOnClickListener(new View.OnClickListener(){
@@ -100,11 +110,16 @@ public class MyNavigationEnemyAdapter extends RecyclerView.Adapter<MyNavigationE
                         switch (item.getItemId()) {
                             case R.id.menu1:
                                 final Intent attackEnemy = new Intent(NavigationActivity.context, BattleActivity.class);
+/*
                                 EnemyQueue queue = new EnemyQueue();
                                 RealmHelper helper = new RealmHelper();
                                 queue.setExist(1);
                                 queue.setEnemyBuffer(mDataset.get(holder.getAdapterPosition()));
                                 helper.addItem(queue);
+*/
+/*
+                                iface.onEnemyClose(mDataset.get(holder.getAdapterPosition()));
+*/
                                 NavigationActivity.context.startActivity(attackEnemy);
 
 /*
@@ -126,6 +141,12 @@ public class MyNavigationEnemyAdapter extends RecyclerView.Adapter<MyNavigationE
 
     }
 
+    public interface OnEnemyApproached {
+
+        void onEnemyClose(Enemy item);
+        void onEnemyFar(Enemy item);
+
+    }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override

@@ -36,7 +36,7 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-public class NavigationActivity extends AppCompatActivity implements MenuFragmentGoTo.SendToDialogActivity{
+public class NavigationActivity extends AppCompatActivity implements MenuFragmentGoTo.SendToDialogActivity, MenuFragmentWeapons.OnEnemyGone{
 
     /**
      *
@@ -84,6 +84,7 @@ public class NavigationActivity extends AppCompatActivity implements MenuFragmen
                 navigationAdapter.notifyDataSetChanged();
             }
         });
+
 /*
         startEnemyLifeService();
 */
@@ -173,6 +174,11 @@ public class NavigationActivity extends AppCompatActivity implements MenuFragmen
 /*
         finish();
 */
+    }
+
+    @Override
+    public void onEnemyGone(Enemy item) {
+
     }
 
     //NAVIGATION DRAWER

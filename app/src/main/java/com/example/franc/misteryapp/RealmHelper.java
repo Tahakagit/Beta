@@ -160,16 +160,19 @@ public class RealmHelper {
         mRealm.close();
         return updatedEnemyList;
     }
-    AllEnemies getEnemyFromID(String enemyId){
+
+    Enemy getEnemyFromID(String enemyId){
+        AllEnemies dbEnemy;
         Realm mRealm = Realm.getDefaultInstance();
-        AllEnemies enemy;
-        try {
-            enemy = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();
-        } finally {
+        dbEnemy = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();
 
-        }
-
-        return enemy;
+        Enemy enemyObj = new Enemy();
+        enemyObj.setId(dbEnemy.getId());
+        enemyObj.setName(dbEnemy.getName());
+        enemyObj.setHealth(dbEnemy.getHealth());
+        enemyObj.setLocation(dbEnemy.getLocation());
+        mRealm.close();
+        return enemyObj;
     }
 
     void setEnemyAttacked(final String enemyId){
@@ -283,12 +286,18 @@ public class RealmHelper {
     }
 
     // GET ENEMIES AT PLAYER'S STAR SYSTEM
-    RealmResults<AllEnemies> getEnemiesAtPLayerPosition(){
+    List<Enemy> getEnemiesAtPLayerPosition(){
         RealmResults<AllEnemies> listOfEnemies;
+        List<Enemy> finalList = new ArrayList<>();
         mRealm = Realm.getDefaultInstance();
         listOfEnemies = mRealm.where(AllEnemies.class).equalTo("location", getPlayerLocation()).findAll();
+        for (AllEnemies res:listOfEnemies) {
+            Enemy enemy = new Enemy();
+            enemy.fetchById(res.getId());
+            finalList.add(enemy);
+        }
         mRealm.close();
-        return listOfEnemies;
+        return finalList;
     }
 
     // RESET UNIVERSE
@@ -458,19 +467,18 @@ public class RealmHelper {
         }
     }
 
-    public void dealEnemyDamage(final AllEnemies item, final int damage){
+    public int dealEnemyDamage(final String enemyId, final int damage){
+        final int newHealth = getEnemyFromID(enemyId).getHealth() - damage;
 
         mRealm = Realm.getDefaultInstance();
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                item.setHealth(item.getHealth() - damage);
-                realm.insertOrUpdate(item);
+                getEnemyFromID(enemyId).setHealth(newHealth);
             }
+
         });
-        if(mRealm != null) {
-            mRealm.close();
-        }
+        return newHealth;
     }
 
 

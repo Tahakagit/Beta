@@ -20,13 +20,14 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
-public class BattleActivity extends AppCompatActivity implements MenuFragmentGoTo.SendToDialogActivity{
+public class BattleActivity extends AppCompatActivity implements MenuFragmentGoTo.SendToDialogActivity, MyNavigationEnemyAdapter.OnEnemyApproached, MenuFragmentWeapons.OnEnemyGone{
     TextView io;
     static RealmHelper helper;
     static MyEnemyAdapter enemyAdapter;
@@ -42,6 +43,7 @@ public class BattleActivity extends AppCompatActivity implements MenuFragmentGoT
     private RecyclerView.LayoutManager mLayoutManagerWeapons;
 
     ArrayList<Enemy> existingEnemies = new ArrayList<>();
+    List<Enemy> approachingEnemy = new ArrayList<>();
 
 
     @Override
@@ -54,7 +56,7 @@ public class BattleActivity extends AppCompatActivity implements MenuFragmentGoT
         playerHealth = findViewById(R.id.id_textview_player_health);
         playerEnergy = findViewById(R.id.id_textview_player_energy);
 
-        enemyAdapter = new MyEnemyAdapter(helper.getEnemyQueue());
+        enemyAdapter = new MyEnemyAdapter(approachingEnemy);
 
         weapons = generateWeapons(25);
         weaponsAdapter = new MyWeaponsAdapter(weapons, helper);
@@ -122,6 +124,22 @@ public class BattleActivity extends AppCompatActivity implements MenuFragmentGoT
 /*
         finish();
 */
+    }
+
+    @Override
+    public void onEnemyClose(Enemy item) {
+        approachingEnemy.add(item);
+    }
+
+    @Override
+    public void onEnemyFar(Enemy item) {
+        approachingEnemy.remove(item);
+
+    }
+
+    @Override
+    public void onEnemyGone(Enemy item) {
+        approachingEnemy.remove(item);
     }
 
     // inserisce N armi e ne restituisce il RealmResult

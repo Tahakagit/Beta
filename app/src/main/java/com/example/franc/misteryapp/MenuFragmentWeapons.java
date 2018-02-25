@@ -34,6 +34,7 @@ public class MenuFragmentWeapons extends Fragment implements MyEnemyAdapter.OnIt
     static RecyclerView listWeapons;
     static RealmHelper helper = new RealmHelper();
     MyWeaponsAdapter weaponsAdapter;
+    // todo diventa List<Enemy> 2
     static RealmList<AllEnemies> selectedEnemies = new RealmList<>();
     private MyEnemyAdapter enemyAdapter;
 
@@ -113,6 +114,7 @@ public class MenuFragmentWeapons extends Fragment implements MyEnemyAdapter.OnIt
 
     }
 
+    //todo diventa List<Enemy> 3
     @Override
     public void onItemDeselected(AllEnemies item) {
         selectedEnemies.remove(item);

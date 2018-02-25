@@ -64,13 +64,12 @@ public class MyEnemyAdapter extends RecyclerView.Adapter<MyEnemyAdapter.ViewHold
 
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
+    // todo diventa list<Enemy> 1
     public MyEnemyAdapter(RealmList<AllEnemies> myDataset) {
         mDataset = myDataset;
         this.activity = activity;
     }
 
-    // todo pasare interfaccia 2
     public MyEnemyAdapter(OnItemSelectionListener callback) {
         this.iface = callback;
     }

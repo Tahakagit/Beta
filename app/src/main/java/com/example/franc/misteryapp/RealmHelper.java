@@ -184,6 +184,50 @@ public class RealmHelper {
         });
     }
 
+    int setEnemyHealth(String enemyId, final int health){
+        mRealm = Realm.getDefaultInstance();
+        final AllEnemies enemi = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();
+
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                enemi.setHealth(health);
+            }
+        });
+        return health;
+
+    }
+
+    int setEnemyId(String enemyId, final int health){
+        mRealm = Realm.getDefaultInstance();
+        final AllEnemies enemi = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();
+
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                enemi.setHealth(health);
+            }
+        });
+        return health;
+
+    }
+
+
+
+    String setEnemyName(String enemyId, final String enemyName){
+        mRealm = Realm.getDefaultInstance();
+        final AllEnemies enemi = mRealm.where(AllEnemies.class).equalTo("id", enemyId).findFirst();
+
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                enemi.setName(enemyName);
+            }
+        });
+        return enemyName;
+
+    }
+
 
     String setEnemyLocation(final String enemyId, final String location){
         mRealm = Realm.getDefaultInstance();

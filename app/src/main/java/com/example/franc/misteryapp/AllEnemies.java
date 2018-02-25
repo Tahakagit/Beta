@@ -9,11 +9,11 @@ import io.realm.annotations.PrimaryKey;
 
 public class AllEnemies extends RealmObject {
 
-    @PrimaryKey
     private String name = null;
     private int health = 20;
     private String location = null;
     private boolean isSelected = false;
+    @PrimaryKey
     private String id = null;
     private Boolean isAttacked = false;
 

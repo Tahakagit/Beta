@@ -19,9 +19,10 @@ public class Enemy{
 
     private String name = null;
     private int health = 20;
+    private String id = null;
+
     private boolean isAdded = false;
     private boolean isSelected = false;
-    private String id = null;
     private String location = null;
     private Boolean isAttacked = false;
     static AsyncTask spawnEnemyTask;
@@ -71,7 +72,6 @@ public class Enemy{
     public void setHealth(int health) {
         this.health = health;
     }
-
     public String getName() {
         return name;
     }
@@ -80,10 +80,11 @@ public class Enemy{
         this.name = name;
     }
 
+    // not used
     public void setSelected(boolean selected) {
         isSelected = selected;
     }
-
+    //not used
     public boolean isSelected() {
         return isSelected;
     }
@@ -106,7 +107,7 @@ public class Enemy{
 
     public void setLocation(String location) {
         this.location = location;
-        helper.setEnemyLocation(this.id, location);
+        helper.setEnemyLocation(id, location);
     }
 
     private class SpawnEnemy extends AsyncTask<Void, Void, Void> {

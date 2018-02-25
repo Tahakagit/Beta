@@ -92,9 +92,13 @@ public class NavigationActivity extends AppCompatActivity implements MenuFragmen
 */
         FragmentManager fragmentManager = getSupportFragmentManager();
 
+/*
         FloatingActionButton fab = findViewById(R.id.fab);
+*/
         PlayerSuperControlCommandOfDestiny controlCommandOfDestiny = new PlayerSuperControlCommandOfDestiny(helper, context, fragmentManager);
+/*
         controlCommandOfDestiny.startFab(fab);
+*/
         LinearLayout ll = findViewById(R.id.bottom_sheet);
         ViewPager vPager = findViewById(R.id.viewpager_player_menu);
         controlCommandOfDestiny.startPlayerMenu(ll, vPager);
